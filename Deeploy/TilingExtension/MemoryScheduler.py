@@ -1,6 +1,50 @@
 # SPDX-FileCopyrightText: 2023 ETH Zurich and University of Bologna
 #
 # SPDX-License-Identifier: Apache-2.0
+"""Memory Scheduler - Constraint-Based Buffer Allocation
+
+This module implements a constraint-based memory scheduler that assigns buffers to
+memory addresses while minimizing total memory usage and avoiding conflicts.
+
+Problem Statement:
+    Given a set of buffers with known lifetimes (when they are alive in the schedule)
+    and sizes, find address assignments that:
+    1. Avoid overlaps: Buffers with overlapping lifetimes must not occupy the same address space
+    2. Minimize peak memory usage across the entire execution
+    3. Respect byte alignment requirements (default: 4-byte alignment)
+
+Algorithm:
+    The scheduler uses Google OR-Tools constraint programming to solve a permutation-based
+    optimization problem:
+
+    1. **Permutation Matrix**: Creates a permutation matrix to reorder buffers, allowing
+       the solver to try different orderings to minimize memory.
+
+    2. **Adjacency Matrix**: Builds a conflict graph where edges indicate buffers with
+       overlapping lifetimes that cannot share memory locations.
+
+    3. **Cost Function**: Minimizes peak memory consumption by considering buffer sizes
+       and their placement in the permuted order.
+
+    4. **Solver**: OR-Tools CP-SAT finds an optimal or near-optimal permutation and
+       address assignment.
+
+Key Components:
+    - MemoryBlock: Represents a buffer with name, lifetime, size, and address space
+    - MemoryScheduler: Main constraint solver using OR-Tools
+    - TilerModel: Constraint model interface
+
+Example:
+    Buffer A: size=100, lifetime=[0, 5]
+    Buffer B: size=200, lifetime=[3, 8]
+    Buffer C: size=150, lifetime=[6, 10]
+
+    Solution:
+    - A and B overlap → must have different addresses
+    - A and C don't overlap → can share memory (reuse A's space)
+    - B and C don't overlap → can share memory (reuse B's space)
+    - Peak memory = max(100 + 200, 150) = 300 bytes (not 450 with no sharing)
+"""
 
 from __future__ import annotations
 
@@ -21,6 +65,18 @@ from Deeploy.TilingExtension.TilerModel import TilerModel
 
 @dataclass
 class MemoryBlock:
+    """Represents a memory buffer with lifetime and address space allocation.
+
+    A MemoryBlock tracks a buffer's allocation in both temporal and spatial dimensions:
+    - Lifetime: Time interval [start, end] when the buffer is alive
+    - Address space: Memory range [start_addr, end_addr] where the buffer is stored
+
+    Attributes:
+        name: Unique identifier for the buffer
+        level: Memory hierarchy level (e.g., "L1", "L2", "L3")
+        lifetime: Tuple (start_time, end_time) indicating when buffer is in use
+        addrSpace: Optional tuple (start_addr, end_addr) for allocated memory region
+    """
     name: str
     level: str
     _lifetime: Tuple[int, int]
@@ -57,17 +113,41 @@ class MemoryBlock:
             self.addrSpace = addrSpace
 
     def collides(self, other: MemoryBlock) -> bool:
+        """Check if this memory block collides with another in the 2D space-time domain.
+
+        Two memory blocks collide if they overlap in BOTH dimensions:
+        1. Temporal: Their lifetimes overlap (both alive at the same time)
+        2. Spatial: Their address spaces overlap (occupy same memory locations)
+
+        This implements interval overlap detection in both dimensions using the
+        standard interval intersection test: [a,b] overlaps [c,d] iff a <= d and b >= c
+
+        Args:
+            other: The MemoryBlock to check for collision
+
+        Returns:
+            True if blocks collide (overlap in both time and space), False otherwise.
+            Returns False if either block lacks address space assignment.
+
+        Example:
+            block1 = MemoryBlock("A", "L1", (0, 5), (0, 100))
+            block2 = MemoryBlock("B", "L1", (3, 8), (50, 150))
+            block1.collides(block2)  # True: overlaps in time [3,5] and space [50,100]
+        """
         assert (isinstance(other, MemoryBlock)), f"{other} is not a MemoryBlock!"
 
+        # Can't collide if addresses haven't been assigned yet
         if self.addrSpace is None or other.addrSpace is None:
             return False
 
-        xCollision: bool = False
-        yCollision: bool = False
+        xCollision: bool = False  # Temporal collision (lifetime overlap)
+        yCollision: bool = False  # Spatial collision (address space overlap)
 
+        # Check lifetime overlap: [a,b] overlaps [c,d] iff a <= d and b >= c
         if self.lifetime[0] <= other.lifetime[1] and self.lifetime[1] >= other.lifetime[0]:
             xCollision = True
 
+        # Check address space overlap using same interval test
         if self.addrSpace[0] < other.addrSpace[1] and self.addrSpace[1] > other.addrSpace[0]:
             yCollision = True
 
@@ -75,6 +155,28 @@ class MemoryBlock:
 
 
 class MemoryScheduler():
+    """Constraint-based memory scheduler that optimizes buffer placement.
+
+    This scheduler uses constraint programming (OR-Tools) to find memory allocations
+    that minimize peak memory usage while respecting buffer lifetimes and avoiding
+    conflicts. It supports multi-level memory hierarchies (L1/L2/L3) and byte alignment.
+
+    Internal Constraint Variables (prefixed with _):
+        _ROWSUMNAME: Row sums in permutation matrix (ensures each row has exactly one 1)
+        _COLSUMNAME: Column sums in permutation matrix (ensures each column has exactly one 1)
+        _PERMUTATIONIDXNAME: Binary variables forming the permutation matrix
+        _INTERMEDIATEADJPRODUCTNAME: Intermediate products in matrix multiplication
+        _FINALADJPRODUCTNAME: Final adjacency matrix after permutation
+        _COSTVARIABLENAME: Height variable H representing peak memory usage
+        _COSTPRODUCTNAME: Products used in cost function computation
+
+    Class Attributes:
+        byteAlignment: Memory alignment requirement in bytes (default: 4)
+
+    The scheduler works in two phases:
+    1. **Constraint Generation**: Build permutation matrix, adjacency matrix, and cost function
+    2. **Solving**: Use OR-Tools to find optimal permutation minimizing peak memory
+    """
     _ROWSUMNAME = "rowSum"
     _COLSUMNAME = "colSum"
     _PERMUTATIONIDXNAME = "permutationIdx"
