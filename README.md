@@ -77,6 +77,29 @@ python testRunner_tiled_siracusa.py -t Tests/testMatMul --cores=8 --l1=16000
 ```
 Now you can open the generated code in `DeeployTest/TEST_SIRACUSA/Tests/testMatMul/Network.c` and see how we executed a tiled layer.
 
+## Creating New Tests from PyTorch Models
+
+Deeploy includes a test generation tool that automates creating test cases from PyTorch models. This addresses [issue #94](https://github.com/pulp-platform/Deeploy/issues/94) by providing a script-based approach to test generation.
+
+To create a new test from a PyTorch model:
+```bash
+python create_deeploy_test.py \
+    --model-path example_models.py \
+    --model-class SimpleGEMM \
+    --test-name testMyGEMM \
+    --input-shapes "1,32" \
+    --seed 42 \
+    --verbose
+```
+
+This will automatically:
+- Export your PyTorch model to ONNX
+- Generate random test inputs
+- Compute expected outputs
+- Create the test directory with all required files (network.onnx, inputs.npz, outputs.npz)
+
+See [TEST_GENERATION.md](TEST_GENERATION.md) for detailed usage instructions and examples.
+
 ## Supported Platforms
 
 | **Platform**           | **Hardware**                                                                                     | **Simulator**                                                  | **CI Status**
