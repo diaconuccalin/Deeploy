@@ -633,6 +633,48 @@ print(c_code)
 
 ### 5. Adding a New Operator
 
+#### Quick Start: Using the add_operator.py Script
+
+Deeploy provides an automated script to streamline adding new operators. This is the **recommended approach** for adding operators.
+
+**Location:** `scripts/add_operator.py`
+
+**Usage:**
+
+```bash
+# Basic usage
+python scripts/add_operator.py --operator <OP_NAME> --platform <PLATFORM> --dtype <DTYPE>
+
+# Example: Add FP32 Conv2D to Siracusa
+python scripts/add_operator.py --operator Conv2D --platform Siracusa --dtype float32
+
+# Example: Add int8 MatMul to Generic
+python scripts/add_operator.py -o MatMul -p Generic -d int8
+
+# Preview without creating files
+python scripts/add_operator.py -o ReLU -p Snitch -d float16 --dry-run
+```
+
+**What it generates:**
+1. Parser class in `Parsers.py`
+2. TypeChecker class in `TypeCheckers.py`
+3. Template file in `Templates/<OPERATOR>Template.py`
+4. Binding definition in `Bindings.py`
+5. Layer class in `Layers.py`
+6. Test template script
+
+**Next steps after generation:**
+1. Fill in TODOs in each generated file
+2. Update `Platform.py` mapping (script shows you how)
+3. Create test using generated test template
+4. Run `make format` and `make lint`
+
+**Full documentation:** See `scripts/README_add_operator.md`
+
+#### Manual Approach: Step-by-Step
+
+If you need more control or want to understand the internals:
+
 **Steps:**
 
 1. **Create Parser** in `Deeploy/Targets/Generic/Parsers.py`:
@@ -1619,6 +1661,9 @@ NetworkDeployer
 # Installation
 pip install -e . --extra-index-url=https://pypi.ngc.nvidia.com
 
+# Adding a new operator (automated)
+python scripts/add_operator.py -o Conv2D -p Siracusa -d float32
+
 # Testing
 cd DeeployTest
 python testRunner_generic.py -t Tests/Adder
@@ -1646,6 +1691,7 @@ pre-commit run --all-files
 - **CI:** `/.github/workflows/`
 - **Libs:** `/TargetLibraries/`
 - **Toolchains:** `/toolchain/`
+- **Scripts:** `/scripts/` (includes `add_operator.py`)
 - **Config:** `/pyproject.toml`, `/CMakeLists.txt`, `/Makefile`
 
 ### External Resources
