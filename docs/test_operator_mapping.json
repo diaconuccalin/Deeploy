@@ -1,0 +1,2043 @@
+{
+  "Adder": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Add"
+    ]
+  },
+  "Attention": {
+    "category": "integration_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [],
+    "operators": [
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "iSoftmax"
+    ]
+  },
+  "Autoencoder1D": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "BatchNormalization",
+      "MaxPool",
+      "Relu",
+      "Flatten",
+      "Gemm",
+      "Constant",
+      "Reshape",
+      "ConvTranspose"
+    ]
+  },
+  "CCT/CCT_1_16_16_128": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_1_16_16_32": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_1_16_16_64": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_1_16_16_8": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_1_32_32_32": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_1_32_32_8": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_2_32_32_128": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "CCT/CCT_2_32_32_128_Opset20": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Shape",
+      "Constant",
+      "Slice",
+      "Concat",
+      "Reshape",
+      "Transpose",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Add",
+      "Gelu",
+      "Squeeze",
+      "Gemm"
+    ]
+  },
+  "Dequant": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Constant",
+      "Sub",
+      "Mul"
+    ]
+  },
+  "EEGFormer": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [],
+    "operators": [
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose"
+    ]
+  },
+  "Hardswish": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "iHardswish"
+    ]
+  },
+  "ICCT": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Transpose",
+      "Reshape",
+      "iLayerNorm",
+      "MatMul",
+      "ITAMax",
+      "Gather",
+      "Add",
+      "iGELU",
+      "IntegerMean",
+      "Gemm"
+    ]
+  },
+  "ICCT_8": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Transpose",
+      "Reshape",
+      "iLayerNorm",
+      "MatMul",
+      "ITAMax",
+      "Gather",
+      "Add",
+      "iGELU",
+      "IntegerMean",
+      "Gemm"
+    ]
+  },
+  "ICCT_ITA": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Transpose",
+      "Reshape",
+      "iLayerNorm",
+      "MatMul",
+      "ITAPartialMax",
+      "Gather",
+      "Add",
+      "iGELU",
+      "IntegerMean",
+      "Gemm"
+    ]
+  },
+  "ICCT_ITA_8": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Transpose",
+      "Reshape",
+      "iLayerNorm",
+      "MatMul",
+      "ITAPartialMax",
+      "Gather",
+      "Add",
+      "iGELU",
+      "IntegerMean",
+      "Gemm"
+    ]
+  },
+  "MLPerf/AnomalyDetection": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm",
+      "RequantShift"
+    ]
+  },
+  "MLPerf/ImageClassification": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "Add",
+      "MaxPool",
+      "Reshape",
+      "Gemm"
+    ]
+  },
+  "MLPerf/KeywordSpotting": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "bias",
+      "grouped",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Reshape",
+      "Gemm"
+    ]
+  },
+  "MLPerf/VisualWakeWords": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "bias",
+      "grouped",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Reshape",
+      "Gemm"
+    ]
+  },
+  "MobileNetv2": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "Add"
+    ]
+  },
+  "MultIO": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Add"
+    ]
+  },
+  "Quant": {
+    "category": "integration_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Constant",
+      "Div",
+      "Add",
+      "Round",
+      "Clip"
+    ]
+  },
+  "QuantizedLinear": {
+    "category": "integration_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [],
+    "operators": [
+      "Constant",
+      "Div",
+      "Add",
+      "Round",
+      "Cast",
+      "Clip",
+      "Sub",
+      "Mul",
+      "Transpose",
+      "MatMul"
+    ]
+  },
+  "RQHardswish": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "requantization"
+    ],
+    "operators": [
+      "iHardswish",
+      "RequantShift"
+    ]
+  },
+  "TestAdderLarge": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int32"
+    ],
+    "features": [
+      "large_tensor"
+    ],
+    "operators": [
+      "Add"
+    ]
+  },
+  "TestRQAdd": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "requantization"
+    ],
+    "operators": [
+      "RequantShift",
+      "Add"
+    ]
+  },
+  "TestiNoNorm": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "iNoNorm"
+    ]
+  },
+  "TestiSoftmaxLarge": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "large_tensor"
+    ],
+    "operators": [
+      "iSoftmax"
+    ]
+  },
+  "Transformer": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [],
+    "operators": [
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "iSoftmax"
+    ]
+  },
+  "WaveFormer": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "grouped",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "Constant",
+      "Reshape",
+      "Transpose",
+      "Mul",
+      "MatMul",
+      "IntegerMean",
+      "Unsqueeze",
+      "IntegerDiv",
+      "Add",
+      "iGELU",
+      "Gemm"
+    ]
+  },
+  "iSoftmax": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "iSoftmax"
+    ]
+  },
+  "largeFloatAdd": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point",
+      "large_tensor"
+    ],
+    "operators": [
+      "Add"
+    ]
+  },
+  "microLlama/microLlama1": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama128": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama16": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama16_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama1_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama2": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama256": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama2_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama32": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama32_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama4": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama4_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama64": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama64_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama8": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "microLlama/microLlama8_parallel": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "iRMSNorm",
+      "MatMul",
+      "Add",
+      "RequantShift",
+      "Reshape",
+      "Transpose",
+      "Concat",
+      "TrueIntegerDiv",
+      "iSoftmax",
+      "iHardswish",
+      "Mul"
+    ]
+  },
+  "miniMobileNet": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "grouped",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "Flatten",
+      "Gemm"
+    ]
+  },
+  "miniMobileNetv2": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "grouped",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "Add",
+      "Flatten",
+      "Gemm"
+    ]
+  },
+  "simpleCNN": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Flatten",
+      "MatMul"
+    ]
+  },
+  "simpleRegression": {
+    "category": "model_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift",
+      "MaxPool",
+      "Flatten",
+      "Gemm"
+    ]
+  },
+  "test1DConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "test1DDWConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise",
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "test1DPad": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "padding"
+    ],
+    "operators": [
+      "Pad"
+    ]
+  },
+  "test2DConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "test2DDWConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise",
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "test2DPad": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "padding"
+    ],
+    "operators": [
+      "Pad"
+    ]
+  },
+  "test2DRequantizedConv": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "padding",
+      "requantization"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "test2DRequantizedStriddedPaddedConv": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "requantization",
+      "strided"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "testBacktracking": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "Concat"
+    ]
+  },
+  "testConcat": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation"
+    ],
+    "operators": [
+      "Concat"
+    ]
+  },
+  "testFloat2DConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DConvolutionBias": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "floating_point",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DConvolutionZeroBias": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "floating_point",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DDWConvolution": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise",
+      "floating_point",
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DDWConvolutionBias": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "depthwise",
+      "floating_point",
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DDWConvolutionZeroBias": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "depthwise",
+      "floating_point",
+      "grouped",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testFloat2DPadding": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point",
+      "padding"
+    ],
+    "operators": [
+      "Pad"
+    ]
+  },
+  "testFloatAdder": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Add"
+    ]
+  },
+  "testFloatDemoTinyViT": {
+    "category": "model_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "floating_point",
+      "grouped",
+      "keepdims",
+      "padding",
+      "strided",
+      "transposed_B"
+    ],
+    "operators": [
+      "Identity",
+      "Conv",
+      "Gelu",
+      "Add",
+      "Shape",
+      "Constant",
+      "Slice",
+      "Concat",
+      "Reshape",
+      "Transpose",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "ReduceMean",
+      "Gemm"
+    ]
+  },
+  "testFloatDiv": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Div"
+    ]
+  },
+  "testFloatGEMM": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "floating_point"
+    ],
+    "operators": [
+      "Gemm"
+    ]
+  },
+  "testFloatGEMMnobias": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm"
+    ]
+  },
+  "testFloatGEMMtransB": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "floating_point",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm"
+    ]
+  },
+  "testFloatGelu": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Gelu"
+    ]
+  },
+  "testFloatLayerNorm": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "floating_point"
+    ],
+    "operators": [
+      "LayerNormalization"
+    ]
+  },
+  "testFloatMatmul": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "MatMul"
+    ]
+  },
+  "testFloatMaxPool": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point",
+      "padding",
+      "strided"
+    ],
+    "operators": [
+      "MaxPool"
+    ]
+  },
+  "testFloatMul": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Mul"
+    ]
+  },
+  "testFloatReduceSum": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "floating_point",
+      "keepdims"
+    ],
+    "operators": [
+      "ReduceSum"
+    ]
+  },
+  "testFloatRelu": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Relu"
+    ]
+  },
+  "testFloatReshape": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Reshape"
+    ]
+  },
+  "testFloatReshapeWithSkipConnection": {
+    "category": "integration_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "bias",
+      "floating_point",
+      "transposed_B"
+    ],
+    "operators": [
+      "MatMul",
+      "Add",
+      "Constant",
+      "Reshape",
+      "Gemm"
+    ]
+  },
+  "testFloatSGD": {
+    "category": "integration_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "axis_operation",
+      "bias",
+      "floating_point",
+      "padding",
+      "strided",
+      "transposed_A",
+      "transposed_B"
+    ],
+    "operators": [
+      "Conv",
+      "Relu",
+      "MaxPool",
+      "Reshape",
+      "Transpose",
+      "Add",
+      "LayerNormalization",
+      "MatMul",
+      "Mul",
+      "Softmax",
+      "Gelu",
+      "Squeeze",
+      "Gemm",
+      "SoftmaxCrossEntropyLoss",
+      "SoftmaxCrossEntropyLossGrad",
+      "SGD"
+    ]
+  },
+  "testFloatSoftmax": {
+    "category": "integration_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "floating_point"
+    ],
+    "operators": [
+      "Softmax"
+    ]
+  },
+  "testFloatSoftmaxCrossEntropy": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "SoftmaxCrossEntropyLoss"
+    ]
+  },
+  "testFloatSoftmaxCrossEntropyGrad": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [
+      "floating_point",
+      "gradient"
+    ],
+    "operators": [
+      "SoftmaxCrossEntropyLossGrad"
+    ]
+  },
+  "testFloatSoftmaxGrad": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "floating_point",
+      "gradient"
+    ],
+    "operators": [
+      "SoftmaxGrad"
+    ]
+  },
+  "testFloatSqueeze": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "floating_point"
+    ],
+    "operators": [
+      "Squeeze"
+    ]
+  },
+  "testFloatTranspose": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "floating_point"
+    ],
+    "operators": [
+      "Transpose"
+    ]
+  },
+  "testGEMM": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm"
+    ]
+  },
+  "testMatMul": {
+    "category": "unit_test",
+    "data_types": [
+      "int32"
+    ],
+    "features": [],
+    "operators": [
+      "MatMul"
+    ]
+  },
+  "testMatMulAdd": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "MatMul",
+      "Add"
+    ]
+  },
+  "testMatMulBatch": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "batched"
+    ],
+    "operators": [
+      "MatMul"
+    ]
+  },
+  "testMaxPool": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "strided"
+    ],
+    "operators": [
+      "MaxPool"
+    ]
+  },
+  "testPointwise": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Conv"
+    ]
+  },
+  "testPointwiseConvBNReLU": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "testPointwiseUnsignedWeights": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "testRMSNorm": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "iRMSNorm"
+    ]
+  },
+  "testRQConv": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int32"
+    ],
+    "features": [
+      "padding",
+      "requantization"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "testRQGEMM": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int32"
+    ],
+    "features": [
+      "bias",
+      "requantization"
+    ],
+    "operators": [
+      "Gemm",
+      "RequantShift"
+    ]
+  },
+  "testRQGEMMTransB": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int32"
+    ],
+    "features": [
+      "bias",
+      "requantization",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm",
+      "RequantShift"
+    ]
+  },
+  "testRQGEMMwBatch": {
+    "category": "integration_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "batched",
+      "requantization"
+    ],
+    "operators": [
+      "Constant",
+      "MatMul",
+      "Add",
+      "RequantShift"
+    ]
+  },
+  "testRQMatMul": {
+    "category": "unit_test",
+    "data_types": [
+      "int32"
+    ],
+    "features": [
+      "requantization"
+    ],
+    "operators": [
+      "MatMul",
+      "RequantShift"
+    ]
+  },
+  "testReduceMean": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "keepdims"
+    ],
+    "operators": [
+      "ReduceMean"
+    ]
+  },
+  "testReduceSum": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "axis_operation",
+      "keepdims"
+    ],
+    "operators": [
+      "ReduceSum"
+    ]
+  },
+  "testRemoveIdentityOp/inputIdentity": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Identity",
+      "Add"
+    ]
+  },
+  "testRemoveIdentityOp/multiOutputIdentity": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Identity",
+      "Add"
+    ]
+  },
+  "testRemoveIdentityOp/outputIdentity": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Identity",
+      "Add"
+    ]
+  },
+  "testRequantizedDWConv": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise",
+      "grouped",
+      "padding",
+      "requantization"
+    ],
+    "operators": [
+      "Conv",
+      "RequantShift"
+    ]
+  },
+  "testRequantizedLinear": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "bias",
+      "requantization",
+      "transposed_B"
+    ],
+    "operators": [
+      "Gemm",
+      "RequantShift"
+    ]
+  },
+  "testSlice": {
+    "category": "unit_test",
+    "data_types": [
+      "float32",
+      "int64"
+    ],
+    "features": [],
+    "operators": [
+      "Slice"
+    ]
+  },
+  "testTrainCCT/CCT1_Classifier_Training": {
+    "category": "unit_test",
+    "data_types": [
+      "int8"
+    ],
+    "features": [
+      "training"
+    ],
+    "operators": []
+  },
+  "testTypeInferenceDifferentTypes": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [],
+    "operators": [
+      "Add"
+    ]
+  },
+  "trueIntegerDivSandwich": {
+    "category": "unit_test",
+    "data_types": [
+      "float32"
+    ],
+    "features": [
+      "depthwise"
+    ],
+    "operators": [
+      "RequantShift",
+      "TrueIntegerDiv"
+    ]
+  }
+}

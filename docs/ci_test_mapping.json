@@ -1,0 +1,900 @@
+{
+  "ci-deeploy": {
+    "workflow_file": "ci-deeploy.yml",
+    "display_name": "CI - Deeploy",
+    "platform": "Multiple",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "jobs": {
+      "build-deeploy": {
+        "description": "Build Deeploy package",
+        "tests": [],
+        "runner_script": null
+      },
+      "deeploy-memory-allocation": {
+        "description": "Memory allocation strategy tests",
+        "tests": ["Tests/CCT/CCT_1_16_16_8"],
+        "runner_script": "testMVP.py",
+        "configurations": {
+          "platform": "Siracusa",
+          "defaultMemLevel": "L2",
+          "l1": [64000],
+          "l2": [75000, 60000, 90000],
+          "memAllocStrategy": ["MiniMalloc", "TetrisRandom"]
+        }
+      },
+      "deeploy-state-serialization": {
+        "description": "State serialization equality tests",
+        "tests": ["Tests/simpleRegression"],
+        "runner_script": "deeployStateEqualityTest.py",
+        "configurations": {
+          "platforms": ["QEMU-ARM", "Siracusa", "MemPool", "Generic"]
+        }
+      },
+      "deeploy-memory-level-extension": {
+        "description": "Memory level extension tests",
+        "tests": ["Tests/simpleRegression"],
+        "runner_script": "testMemoryLevelExtension.py",
+        "configurations": {
+          "platforms": ["QEMU-ARM", "Siracusa", "MemPool", "Generic"]
+        }
+      },
+      "deeploy-tiler-extension": {
+        "description": "Tiler extension tests",
+        "tests": [
+          "Tests/simpleRegression",
+          "Tests/simpleCNN",
+          "Tests/testMatMul",
+          "Tests/testMaxPool"
+        ],
+        "runner_script": "testTilerExtension.py",
+        "configurations": {
+          "platform": "Siracusa",
+          "l1_fail_case": 2000
+        }
+      },
+      "deeploy-memory-allocation-extension": {
+        "description": "Memory allocation extension tests",
+        "tests": [
+          "Tests/simpleRegression",
+          "Tests/simpleCNN",
+          "Tests/miniMobileNet",
+          "Tests/miniMobileNetv2",
+          "Tests/testMatMul",
+          "Tests/testMaxPool"
+        ],
+        "runner_script": "testTilerExtension.py",
+        "configurations": {
+          "platform": "Siracusa"
+        }
+      },
+      "deeploy-typing": {
+        "description": "Type system tests",
+        "tests": [],
+        "runner_script": "testTypes.py"
+      },
+      "deeploy-debug": {
+        "description": "Debug print and transformation tests",
+        "tests": ["Tests/simpleRegression"],
+        "runner_scripts": [
+          "testPrintInputOutputTransformation.py",
+          "testDebugPrintPass.py"
+        ],
+        "configurations": {
+          "platforms": ["Generic", "Siracusa"]
+        }
+      },
+      "deeploy-regex-matching": {
+        "description": "Regex matching tests",
+        "tests": [],
+        "runner_script": "testRegexMatching.py"
+      },
+      "deeploy-test-dmas": {
+        "description": "DMA tests",
+        "tests": [],
+        "runner_script": "testDmas.py"
+      }
+    }
+  },
+
+  "ci-deeploy-testing": {
+    "workflow_file": "ci-deeploy-testing.yml",
+    "display_name": "CI - Deeploy Testing",
+    "platform": "Generic",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "jobs": {
+      "generate-network-type-inference": {
+        "description": "Type inference tests with matrix",
+        "tests": ["Tests/testTypeInferenceDifferentTypes"],
+        "runner_script": "generateNetwork.py",
+        "matrix": [
+          {
+            "name": "fail-input0",
+            "platform": "Generic",
+            "type_map": "A=int8_t B=int8_t C=int8_t",
+            "offset_map": "A=0 B=0 C=0",
+            "shouldFail": true
+          },
+          {
+            "name": "fail-input2",
+            "platform": "Generic",
+            "type_map": "A=int16_t B=int8_t C=int16_t",
+            "offset_map": "A=0 B=0 C=0",
+            "shouldFail": true
+          },
+          {
+            "name": "pass",
+            "platform": "Generic",
+            "type_map": "A=int16_t B=int8_t C=int32_t",
+            "offset_map": "A=0 B=0 C=0",
+            "shouldFail": false
+          }
+        ]
+      }
+    }
+  },
+
+  "ci-platform-generic": {
+    "workflow_file": "ci-platform-generic.yml",
+    "display_name": "CI - Generic",
+    "platform": "Generic",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-generic.yml",
+    "runner_script": "testRunner_generic.py",
+    "jobs": {
+      "generic-kernels": {
+        "tests": [
+          "Adder",
+          "MultIO",
+          "test1DConvolution",
+          "test2DConvolution",
+          "test1DDWConvolution",
+          "test2DDWConvolution",
+          "test1DPad",
+          "test2DPad",
+          "testGEMM",
+          "testMatMul",
+          "testMatMulAdd",
+          "testMaxPool",
+          "testRQConv",
+          "testRQMatMul",
+          "testReduceSum",
+          "testReduceMean",
+          "testSlice",
+          "testRequantizedDWConv",
+          "test2DRequantizedConv",
+          "iSoftmax",
+          "testFloatAdder",
+          "testFloatGEMM",
+          "testFloat2DConvolution",
+          "testFloat2DConvolutionBias",
+          "testFloat2DConvolutionZeroBias",
+          "testFloatLayerNorm",
+          "testFloatDiv",
+          "testFloat2DDWConvolution",
+          "testFloat2DDWConvolutionBias",
+          "testFloat2DDWConvolutionZeroBias",
+          "testFloatRelu",
+          "testFloatMaxPool",
+          "testFloatMatmul",
+          "testFloatReshapeWithSkipConnection",
+          "testFloatSoftmax",
+          "testFloatTranspose",
+          "testFloatMul",
+          "Quant",
+          "Dequant",
+          "QuantizedLinear"
+        ]
+      },
+      "generic-models": {
+        "tests": [
+          "simpleRegression",
+          "WaveFormer",
+          "simpleCNN",
+          "ICCT",
+          "ICCT_ITA",
+          "ICCT_8",
+          "ICCT_ITA_8",
+          "miniMobileNet",
+          "miniMobileNetv2",
+          "CCT/CCT_1_16_16_8",
+          "CCT/CCT_2_32_32_128_Opset20",
+          "testFloatDemoTinyViT",
+          "Autoencoder1D"
+        ]
+      }
+    }
+  },
+
+  "ci-platform-cortexm": {
+    "workflow_file": "ci-platform-cortexm.yml",
+    "display_name": "CI - Cortex-M",
+    "platform": "CortexM",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-cortexm.yml",
+    "runner_script": "testRunner_cortexm.py",
+    "jobs": {
+      "cortexm-kernels": {
+        "tests": [
+          "Adder",
+          "MultIO",
+          "test1DPad",
+          "test2DPad",
+          "testMatMul",
+          "testMatMulAdd",
+          "testMaxPool",
+          "testRQConv",
+          "testReduceSum",
+          "testReduceMean",
+          "testSlice"
+        ]
+      },
+      "cortexm-models": {
+        "tests": [
+          "simpleRegression",
+          "WaveFormer"
+        ]
+      }
+    }
+  },
+
+  "ci-platform-mempool": {
+    "workflow_file": "ci-platform-mempool.yml",
+    "display_name": "CI - Mempool",
+    "platform": "MemPool",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-mempool.yml",
+    "runner_script": "testRunner_mempool.py",
+    "jobs": {
+      "mempool-kernels": {
+        "tests": [
+          "Adder",
+          "MultIO",
+          "test1DConvolution",
+          "test2DConvolution",
+          "test1DDWConvolution",
+          "test2DDWConvolution",
+          "test1DPad",
+          "test2DPad",
+          "testGEMM",
+          "testMatMul",
+          "testMatMulAdd",
+          "testMaxPool",
+          "testRQConv",
+          "testRQGEMM",
+          "testRQMatMul",
+          "testReduceSum",
+          "testReduceMean",
+          "testSlice",
+          "testRequantizedDWConv",
+          "test2DRequantizedConv"
+        ]
+      },
+      "mempool-models": {
+        "tests": [
+          "simpleRegression",
+          "simpleCNN",
+          "ICCT",
+          "ICCT_ITA",
+          "ICCT_8",
+          "miniMobileNet",
+          "miniMobileNetv2"
+        ]
+      }
+    }
+  },
+
+  "ci-platform-snitch": {
+    "workflow_file": "ci-platform-snitch.yml",
+    "display_name": "CI - Snitch",
+    "platform": "Snitch",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-snitch.yml",
+    "runner_script": "testRunner_snitch.py",
+    "jobs": {
+      "snitch-kernels": {
+        "tests": [
+          "Adder",
+          "iSoftmax",
+          "TestiNoNorm",
+          "TestAdderLarge",
+          "TestiSoftmaxLarge",
+          "testMatMul",
+          "testRQGEMM",
+          "TestRQAdd",
+          "testRQGEMMTransB",
+          "testFloatSoftmax"
+        ],
+        "configurations": {
+          "num_cores": 9,
+          "simulators": ["gvsoc"]
+        }
+      }
+    }
+  },
+
+  "ci-platform-snitch-tiled": {
+    "workflow_file": "ci-platform-snitch-tiled.yml",
+    "display_name": "CI - Snitch (Tiled)",
+    "platform": "Snitch",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-snitch-tiled-sequential.yml",
+    "runner_script": "testRunner_tiled_snitch.py",
+    "jobs": {
+      "snitch-kernels-tiled-singlebuffer-L2": {
+        "description": "Single-buffer L2 tiled tests",
+        "tests_config": [
+          {"name": "TestiNoNorm", "L1": [5000, 10000]},
+          {"name": "TestAdderLarge", "L1": [5000, 10000]},
+          {"name": "TestiSoftmaxLarge", "L1": [5000, 10000]},
+          {"name": "testRQGEMM", "L1": [2000, 5000]},
+          {"name": "testFloatSoftmax", "L1": [2000, 5000, 10000]},
+          {"name": "TestRQAdd", "L1": [5000, 10000]},
+          {"name": "testFloatGEMM", "L1": [2000, 5000, 10000]},
+          {"name": "testFloatGEMMtransB", "L1": [2000, 5000, 10000]}
+        ],
+        "configurations": {
+          "num_cores": 9,
+          "default_memory_level": "L2",
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max",
+          "simulators": ["gvsoc"]
+        }
+      }
+    }
+  },
+
+  "ci-platform-siracusa": {
+    "workflow_file": "ci-platform-siracusa.yml",
+    "display_name": "CI - Siracusa",
+    "platform": "Siracusa",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-siracusa.yml",
+    "runner_script": "testRunner_siracusa.py",
+    "jobs": {
+      "siracusa-kernels": {
+        "tests": [
+          "Adder",
+          "MultIO",
+          "test1DPad",
+          "test2DPad",
+          "testMatMul",
+          "testMatMulAdd",
+          "testRequantizedDWConv",
+          "test2DRequantizedConv",
+          "iSoftmax",
+          "testConcat",
+          "testRMSNorm",
+          "trueIntegerDivSandwich",
+          "Hardswish",
+          "RQHardswish",
+          "testBacktracking",
+          "testFloatAdder",
+          "testFloatGEMM",
+          "testFloat2DConvolution",
+          "testFloat2DConvolutionBias",
+          "testFloat2DConvolutionZeroBias",
+          "testFloat2DDWConvolution",
+          "testFloat2DDWConvolutionBias",
+          "testFloat2DDWConvolutionZeroBias",
+          "testFloatLayerNorm",
+          "testFloatRelu",
+          "testFloatMaxPool",
+          "testFloatMatmul",
+          "testFloatSoftmax",
+          "testFloatTranspose",
+          "testFloatMul",
+          "Quant",
+          "Dequant",
+          "testFloatReduceSum",
+          "testFloatReshapeWithSkipConnection",
+          "testFloatSoftmaxGrad",
+          "testFloatSoftmaxCrossEntropy",
+          "testFloatSoftmaxCrossEntropyGrad",
+          "QuantizedLinear"
+        ],
+        "configurations": {
+          "num_cores": 8
+        }
+      },
+      "siracusa-models": {
+        "tests": [
+          "simpleRegression",
+          "miniMobileNet",
+          "miniMobileNetv2",
+          "Attention",
+          "MLPerf/KeywordSpotting",
+          "MLPerf/ImageClassification",
+          "MLPerf/AnomalyDetection",
+          "CCT/CCT_1_16_16_8",
+          "CCT/CCT_2_32_32_128_Opset20",
+          "testTrainCCT/CCT1_Classifier_Training/CCT_1_16_16_8",
+          "testFloatDemoTinyViT"
+        ],
+        "configurations": {
+          "num_cores": 8
+        }
+      }
+    }
+  },
+
+  "ci-platform-siracusa-tiled": {
+    "workflow_file": "ci-platform-siracusa-tiled.yml",
+    "display_name": "CI - Siracusa (Tiled)",
+    "platform": "Siracusa",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflows": ["_runner-siracusa-tiled-sequential.yml", "_runner-siracusa-tiled.yml"],
+    "runner_script": "testRunner_tiled_siracusa.py",
+    "jobs": {
+      "siracusa-kernels-tiled-singlebuffer-L2": {
+        "description": "Single-buffer L2 tiled kernel tests",
+        "runner_workflow": "_runner-siracusa-tiled-sequential.yml",
+        "tests_config": [
+          {"name": "testMatMul", "L1": [64000, 32000, 16000]},
+          {"name": "test2DRequantizedConv", "L1": [8000, 6000, 4000]},
+          {"name": "test2DRequantizedStriddedPaddedConv", "L1": [600]},
+          {"name": "testRequantizedDWConv", "L1": [2561]},
+          {"name": "iSoftmax", "L1": [800, 500, 300]},
+          {"name": "testConcat", "L1": [32000, 16000, 8000]},
+          {"name": "testRMSNorm", "L1": [2048, 1024, 512]},
+          {"name": "Hardswish", "L1": [750]},
+          {"name": "RQHardswish", "L1": [750]},
+          {"name": "testFloatGEMM", "L1": [8000]},
+          {"name": "testFloat2DConvolution", "L1": [1600]},
+          {"name": "testFloat2DConvolutionBias", "L1": [6600]},
+          {"name": "testFloat2DConvolutionZeroBias", "L1": [6600]},
+          {"name": "testFloat2DDWConvolution", "L1": [7200]},
+          {"name": "testFloat2DDWConvolutionBias", "L1": [7200]},
+          {"name": "testFloat2DDWConvolutionZeroBias", "L1": [7200]},
+          {"name": "testFloatLayerNorm", "L1": [2000]},
+          {"name": "testFloatMaxPool", "L1": [2000]},
+          {"name": "testFloatMatmul", "L1": [2000]},
+          {"name": "testFloatRelu", "L1": [2000]},
+          {"name": "testFloatReshapeWithSkipConnection", "L1": [1400]},
+          {"name": "testFloatSoftmax", "L1": [4000]},
+          {"name": "testFloatTranspose", "L1": [2000]},
+          {"name": "testFloatMul", "L1": [2000]},
+          {"name": "largeFloatAdd", "L1": [220000]},
+          {"name": "testRQGEMMwBatch", "L1": [20000]},
+          {"name": "testMatMulBatch", "L1": [20000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": false,
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max"
+        }
+      },
+      "siracusa-kernels-tiled-doublebuffer-L2": {
+        "description": "Double-buffer L2 tiled kernel tests",
+        "runner_workflow": "_runner-siracusa-tiled-sequential.yml",
+        "tests_config": [
+          {"name": "testMatMul", "L1": [64000, 32000, 16000]},
+          {"name": "test2DRequantizedConv", "L1": [8000, 6000, 5000]},
+          {"name": "testRequantizedDWConv", "L1": [5121]},
+          {"name": "iSoftmax", "L1": [1600, 1000, 600]},
+          {"name": "testConcat", "L1": [64000, 32000, 16000]},
+          {"name": "testRMSNorm", "L1": [4096, 2048, 1024]},
+          {"name": "Hardswish", "L1": [750]},
+          {"name": "RQHardswish", "L1": [800]},
+          {"name": "testFloatGEMM", "L1": [8000]},
+          {"name": "testFloat2DConvolution", "L1": [2000]},
+          {"name": "testFloat2DConvolutionBias", "L1": [8800]},
+          {"name": "testFloat2DConvolutionZeroBias", "L1": [8800]},
+          {"name": "testFloat2DDWConvolution", "L1": [9800]},
+          {"name": "testFloat2DDWConvolutionBias", "L1": [10000]},
+          {"name": "testFloat2DDWConvolutionZeroBias", "L1": [9800]},
+          {"name": "testFloatLayerNorm", "L1": [2000]},
+          {"name": "testFloatMaxPool", "L1": [5000]},
+          {"name": "testFloatMatmul", "L1": [5000]},
+          {"name": "testFloatRelu", "L1": [20]},
+          {"name": "testFloatReshapeWithSkipConnection", "L1": [2600]},
+          {"name": "testFloatSoftmax", "L1": [8000]},
+          {"name": "testFloatTranspose", "L1": [2000]},
+          {"name": "testFloatMul", "L1": [2000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": true,
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max"
+        }
+      },
+      "siracusa-models-tiled-singlebuffer-L2": {
+        "description": "Single-buffer L2 tiled model tests",
+        "runner_workflow": "_runner-siracusa-tiled.yml",
+        "matrix": [
+          {"name": "simpleRegression", "L1": [45000, 30000, 15000]},
+          {"name": "miniMobileNet", "L1": [60000, 12000, 6000, 3000]},
+          {"name": "miniMobileNetv2", "L1": [60000, 16000, 12000, 8000]},
+          {"name": "Attention", "L1": [60000, 10000, 5000]},
+          {"name": "microLlama/microLlama1", "L1": [60000, 10000, 5000]},
+          {"name": "microLlama/microLlama8", "L1": [60000, 10000, 5000]},
+          {"name": "microLlama/microLlama8_parallel", "L1": [60000, 10000, 5000]},
+          {"name": "MLPerf/KeywordSpotting", "L1": [64000]},
+          {"name": "MLPerf/ImageClassification", "L1": [64000]},
+          {"name": "MLPerf/AnomalyDetection", "L1": [64000]},
+          {"name": "CCT/CCT_1_16_16_8", "L1": [2000, 64000]},
+          {"name": "testTrainCCT/CCT1_Classifier_Training/CCT_1_16_16_8", "L1": [4000, 64000]},
+          {"name": "testFloatDemoTinyViT", "L1": [4000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": false,
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max"
+        }
+      },
+      "siracusa-models-tiled-singlebuffer-L3": {
+        "description": "Single-buffer L3 tiled model tests",
+        "runner_workflow": "_runner-siracusa-tiled.yml",
+        "matrix": [
+          {"name": "simpleRegression", "L1": [45000, 30000, 16000]},
+          {"name": "miniMobileNet", "L1": [60000, 12000, 6000]},
+          {"name": "miniMobileNetv2", "L1": [60000, 16000, 12000, 8000]},
+          {"name": "Attention", "L1": [60000, 10000, 5000, 2500]},
+          {"name": "Transformer", "L1": [60000, 30000, 15000]},
+          {"name": "microLlama/microLlama1", "L1": [60000, 10000, 5000]},
+          {"name": "CCT/CCT_2_32_32_128", "L1": [64000, 128000]},
+          {"name": "testTrainCCT/CCT1_Classifier_Training/CCT_1_16_16_128", "L1": [32000, 64000]},
+          {"name": "testFloatDemoTinyViT", "L1": [4000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L3",
+          "double_buffer": false,
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max"
+        }
+      },
+      "siracusa-models-tiled-doublebuffer-L3": {
+        "description": "Double-buffer L3 tiled model tests",
+        "runner_workflow": "_runner-siracusa-tiled.yml",
+        "matrix": [
+          {"name": "simpleRegression", "L1": [60000, 45000, 30000]},
+          {"name": "miniMobileNet", "L1": [60000, 24000, 12000, 6000]},
+          {"name": "miniMobileNetv2", "L1": [60000, 32000, 24000, 16000]},
+          {"name": "Attention", "L1": [60000, 20000, 10000, 5000]},
+          {"name": "Transformer", "L1": [60000, 30000, 15000]},
+          {"name": "microLlama/microLlama1", "L1": [60000, 20000, 10000]},
+          {"name": "microLlama/microLlama8", "L1": [60000, 20000, 10000]},
+          {"name": "microLlama/microLlama8_parallel", "L1": [60000, 20000, 10000]},
+          {"name": "CCT/CCT_2_32_32_128", "L1": [64000, 128000]},
+          {"name": "testTrainCCT/CCT1_Classifier_Training/CCT_1_16_16_128", "L1": [8000, 64000]},
+          {"name": "testFloatDemoTinyViT", "L1": [4000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L3",
+          "double_buffer": true,
+          "memory_allocation_strategy": "MiniMalloc",
+          "search_strategy": "random-max"
+        }
+      }
+    }
+  },
+
+  "ci-platform-siracusa-neureka-tiled": {
+    "workflow_file": "ci-platform-siracusa-neureka-tiled.yml",
+    "display_name": "CI - Siracusa + Neureka (Tiled)",
+    "platform": "Siracusa",
+    "accelerator": "Neureka",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflows": ["_runner-siracusa-neureka-tiled-sequential.yml", "_runner-siracusa-neureka-tiled.yml"],
+    "runner_script": "testRunner_tiled_siracusa_w_neureka.py",
+    "jobs": {
+      "siracusa-neureka-kernels-tiled-singlebuffer-L2": {
+        "description": "Single-buffer L2 Neureka tiled kernel tests",
+        "runner_workflow": "_runner-siracusa-neureka-tiled-sequential.yml",
+        "tests_config": [
+          {"name": "testRequantizedLinear", "L1": [16000]},
+          {"name": "testPointwise", "L1": [32000]},
+          {"name": "testPointwiseConvBNReLU", "L1": [32000]},
+          {"name": "testPointwiseUnsignedWeights", "L1": [32000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": false
+        }
+      },
+      "siracusa-neureka-kernels-tiled-doublebuffer-L2": {
+        "description": "Double-buffer L2 Neureka tiled kernel tests",
+        "runner_workflow": "_runner-siracusa-neureka-tiled-sequential.yml",
+        "tests_config": [
+          {"name": "testRequantizedLinear", "L1": [16000]},
+          {"name": "testPointwise", "L1": [32000]},
+          {"name": "testPointwiseConvBNReLU", "L1": [32000]},
+          {"name": "testPointwiseUnsignedWeights", "L1": [32000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": true
+        }
+      },
+      "siracusa-neureka-models-tiled-singlebuffer-L3": {
+        "description": "Single-buffer L3 Neureka tiled model tests",
+        "runner_workflow": "_runner-siracusa-neureka-tiled.yml",
+        "matrix": [
+          {"name": "miniMobileNet", "L1": [2000]},
+          {"name": "Attention", "L1": [2500]},
+          {"name": "Transformer", "L1": [15000]},
+          {"name": "microLlama/microLlama1", "L1": [10000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L3",
+          "double_buffer": false
+        }
+      },
+      "siracusa-neureka-models-tiled-doublebuffer-L3": {
+        "description": "Double-buffer L3 Neureka tiled model tests",
+        "runner_workflow": "_runner-siracusa-neureka-tiled.yml",
+        "matrix": [
+          {"name": "miniMobileNet", "L1": [2000]},
+          {"name": "Attention", "L1": [5000]},
+          {"name": "Transformer", "L1": [30000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L3",
+          "double_buffer": true
+        }
+      },
+      "siracusa-neureka-kernels-tiled-singlebuffer-L2-wmem": {
+        "description": "Single-buffer L2 Neureka tiled kernel tests with weight memory",
+        "runner_workflow": "_runner-siracusa-neureka-tiled-sequential.yml",
+        "tests_config": [
+          {"name": "testRequantizedLinear", "L1": [16000]},
+          {"name": "testPointwise", "L1": [32000]},
+          {"name": "testPointwiseConvBNReLU", "L1": [32000]},
+          {"name": "testPointwiseUnsignedWeights", "L1": [32000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L2",
+          "double_buffer": false,
+          "neureka_wmem": true
+        }
+      },
+      "siracusa-neureka-models-tiled-doublebuffer-L3-wmem": {
+        "description": "Double-buffer L3 Neureka tiled model tests with weight memory",
+        "runner_workflow": "_runner-siracusa-neureka-tiled.yml",
+        "matrix": [
+          {"name": "miniMobileNet", "L1": [2000]},
+          {"name": "Attention", "L1": [3500]},
+          {"name": "microLlama/microLlama1", "L1": [10000]}
+        ],
+        "configurations": {
+          "num_cores": 8,
+          "default_memory_level": "L3",
+          "double_buffer": true,
+          "neureka_wmem": true
+        }
+      }
+    }
+  },
+
+  "ci-platform-softhier": {
+    "workflow_file": "ci-platform-softhier.yml",
+    "display_name": "CI - SoftHier",
+    "platform": "SoftHier",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-softhier.yml",
+    "runner_script": "testRunner_softhier.py",
+    "jobs": {
+      "softhier-kernels": {
+        "tests": ["Adder"],
+        "configurations": {
+          "toolchain": "GCC"
+        }
+      }
+    }
+  },
+
+  "ci-platform-chimera": {
+    "workflow_file": "ci-platform-chimera.yml",
+    "display_name": "CI - Chimera",
+    "platform": "Chimera",
+    "triggers": ["push", "pull_request", "workflow_dispatch"],
+    "runner_workflow": "_runner-chimera.yml",
+    "runner_script": "testRunner_chimera.py",
+    "jobs": {
+      "chimera-kernels": {
+        "tests": ["Adder"],
+        "configurations": {
+          "simulators": ["gvsoc"]
+        }
+      }
+    }
+  },
+
+  "runners": {
+    "_runner-generic": {
+      "workflow_file": "_runner-generic.yml",
+      "runner_script": "testRunner_generic.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names"],
+        "optional": []
+      }
+    },
+    "_runner-cortexm": {
+      "workflow_file": "_runner-cortexm.yml",
+      "runner_script": "testRunner_cortexm.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names"],
+        "optional": []
+      }
+    },
+    "_runner-mempool": {
+      "workflow_file": "_runner-mempool.yml",
+      "runner_script": "testRunner_mempool.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names"],
+        "optional": []
+      }
+    },
+    "_runner-snitch": {
+      "workflow_file": "_runner-snitch.yml",
+      "runner_script": "testRunner_snitch.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names", "num-cores", "simulators"],
+        "optional": []
+      }
+    },
+    "_runner-snitch-tiled-sequential": {
+      "workflow_file": "_runner-snitch-tiled-sequential.yml",
+      "runner_script": "testRunner_tiled_snitch.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "tests-config", "simulators"],
+        "optional": {
+          "num-cores": 9,
+          "default-memory-level": "L2",
+          "memory-allocation-strategy": "MiniMalloc",
+          "search-strategy": "random-max"
+        }
+      }
+    },
+    "_runner-siracusa": {
+      "workflow_file": "_runner-siracusa.yml",
+      "runner_script": "testRunner_siracusa.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names", "num-cores"],
+        "optional": []
+      }
+    },
+    "_runner-siracusa-tiled": {
+      "workflow_file": "_runner-siracusa-tiled.yml",
+      "runner_script": "testRunner_tiled_siracusa.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-name"],
+        "optional": {
+          "num-cores": 8,
+          "L1": "[64000]",
+          "default-memory-level": "L2",
+          "double-buffer": false,
+          "memory-allocation-strategy": "MiniMalloc",
+          "search-strategy": "random-max"
+        }
+      }
+    },
+    "_runner-siracusa-tiled-sequential": {
+      "workflow_file": "_runner-siracusa-tiled-sequential.yml",
+      "runner_script": "testRunner_tiled_siracusa.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "tests-config"],
+        "optional": {
+          "num-cores": 8,
+          "default-memory-level": "L2",
+          "double-buffer": false,
+          "memory-allocation-strategy": "MiniMalloc",
+          "search-strategy": "random-max"
+        }
+      }
+    },
+    "_runner-siracusa-neureka-tiled": {
+      "workflow_file": "_runner-siracusa-neureka-tiled.yml",
+      "runner_script": "testRunner_tiled_siracusa_w_neureka.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-name"],
+        "optional": {
+          "num-cores": 8,
+          "L1": "[64000]",
+          "default-memory-level": "L2",
+          "double-buffer": false,
+          "memory-allocation-strategy": "MiniMalloc",
+          "search-strategy": "random-max",
+          "neureka-wmem": false
+        }
+      }
+    },
+    "_runner-siracusa-neureka-tiled-sequential": {
+      "workflow_file": "_runner-siracusa-neureka-tiled-sequential.yml",
+      "runner_script": "testRunner_tiled_siracusa_w_neureka.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "tests-config"],
+        "optional": {
+          "num-cores": 8,
+          "default-memory-level": "L2",
+          "double-buffer": false,
+          "memory-allocation-strategy": "MiniMalloc",
+          "search-strategy": "random-max",
+          "neureka-wmem": false
+        }
+      }
+    },
+    "_runner-softhier": {
+      "workflow_file": "_runner-softhier.yml",
+      "runner_script": "testRunner_softhier.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names"],
+        "optional": []
+      },
+      "configurations": {
+        "toolchain": "GCC"
+      }
+    },
+    "_runner-chimera": {
+      "workflow_file": "_runner-chimera.yml",
+      "runner_script": "testRunner_chimera.py",
+      "inputs": {
+        "required": ["runner", "docker-image", "test-names", "simulators"],
+        "optional": []
+      }
+    }
+  },
+
+  "summary": {
+    "total_workflows": 12,
+    "total_runner_workflows": 12,
+    "platforms": {
+      "Generic": {
+        "test_count": 52,
+        "runner_script": "testRunner_generic.py"
+      },
+      "CortexM": {
+        "test_count": 13,
+        "runner_script": "testRunner_cortexm.py"
+      },
+      "MemPool": {
+        "test_count": 27,
+        "runner_script": "testRunner_mempool.py"
+      },
+      "Snitch": {
+        "test_count": 10,
+        "runner_script": "testRunner_snitch.py"
+      },
+      "Snitch-Tiled": {
+        "test_count": 8,
+        "runner_script": "testRunner_tiled_snitch.py"
+      },
+      "Siracusa": {
+        "test_count": 49,
+        "runner_script": "testRunner_siracusa.py"
+      },
+      "Siracusa-Tiled": {
+        "test_count": 50,
+        "runner_scripts": ["testRunner_tiled_siracusa.py"]
+      },
+      "Siracusa-Neureka-Tiled": {
+        "test_count": 11,
+        "runner_script": "testRunner_tiled_siracusa_w_neureka.py"
+      },
+      "SoftHier": {
+        "test_count": 1,
+        "runner_script": "testRunner_softhier.py"
+      },
+      "Chimera": {
+        "test_count": 1,
+        "runner_script": "testRunner_chimera.py"
+      }
+    },
+    "common_triggers": ["push", "pull_request", "workflow_dispatch"],
+    "default_docker_image": "ghcr.io/pulp-platform/deeploy:devel",
+    "memory_allocation_strategies": ["MiniMalloc", "TetrisRandom"],
+    "search_strategies": ["random-max"]
+  }
+}
