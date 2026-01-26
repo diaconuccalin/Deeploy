@@ -1,0 +1,63 @@
+# MobileNet v2 x0.35 Layer Deduplication Report
+
+This table shows the unique layer configurations and their occurrence counts.
+
+| Layer Name | Layer Type | Occurrences |
+|------------|------------|-------------|
+| 55_stage2_stage2_1_Add | Add | 13 |
+| 817_stage4_stage4_2_Cast_1 | Cast | 32 |
+| 153_stage2_stage2_2_Concat_1 | Concat | 16 |
+| 185_stage2_stage2_3_Concat | Concat | 4 |
+| 522_stage3_stage3_5_Concat | Concat | 8 |
+| 559_stage3_stage3_5_Concat_2 | Concat | 16 |
+| 859_stage4_stage4_3_Concat | Concat | 4 |
+| 333_stage3_stage3_2_Constant_2 | Constant | 222 |
+| 466_stage3_stage3_4_Constant_6 | Constant | 80 |
+| 00_conv1_conv1_0_Conv | Conv | 1 |
+| 04_stage2_stage2_0_branch1_branch1_2_Conv | Conv | 1 |
+| 06_stage2_stage2_0_branch2_branch2_0_Conv | Conv | 1 |
+| 09_stage2_stage2_0_branch2_branch2_5_Conv | Conv | 7 |
+| 227_stage3_stage3_0_branch2_branch2_0_Conv | Conv | 1 |
+| 575_stage3_stage3_6_branch2_branch2_0_Conv | Conv | 16 |
+| 680_stage4_stage4_0_branch2_branch2_0_Conv | Conv | 1 |
+| 741_stage4_stage4_1_branch2_branch2_5_Conv | Conv | 8 |
+| 898_conv5_conv5_0_Conv | Conv | 1 |
+| 03_stage2_stage2_0_branch1_branch1_0_Conv | DWConv | 1 |
+| 08_stage2_stage2_0_branch2_branch2_3_Conv | DWConv | 1 |
+| 224_stage3_stage3_0_branch1_branch1_0_Conv | DWConv | 2 |
+| 345_stage3_stage3_2_branch2_branch2_3_Conv | DWConv | 7 |
+| 66_stage2_stage2_1_branch2_branch2_3_Conv | DWConv | 3 |
+| 677_stage4_stage4_0_branch1_branch1_0_Conv | DWConv | 2 |
+| 856_stage4_stage4_3_branch2_branch2_3_Conv | DWConv | 3 |
+| 304_stage3_stage3_1_Div_1 | Div | 16 |
+| 510_stage3_stage3_5_Div | Div | 13 |
+| 17_stage2_stage2_0_Gather_1 | Gather | 64 |
+| 842_stage4_stage4_3_Gather | Gather | 13 |
+| 901_fc_Gemm | Gemm | 1 |
+| 02_maxpool_MaxPool | MaxPool | 1 |
+| 283_stage3_stage3_1_Mul_1 | Mul | 26 |
+| 900_ReduceMean | ReduceMean | 1 |
+| 01_conv1_conv1_2_Relu | Relu | 1 |
+| 07_stage2_stage2_0_branch2_branch2_2_Relu | Relu | 1 |
+| 228_stage3_stage3_0_branch2_branch2_2_Relu | Relu | 1 |
+| 286_stage3_stage3_1_branch2_branch2_2_Relu | Relu | 16 |
+| 681_stage4_stage4_0_branch2_branch2_2_Relu | Relu | 1 |
+| 68_stage2_stage2_1_branch2_branch2_7_Relu | Relu | 8 |
+| 797_stage4_stage4_2_branch2_branch2_2_Relu | Relu | 8 |
+| 899_conv5_conv5_2_Relu | Relu | 1 |
+| 259_stage3_stage3_0_Reshape | Reshape | 8 |
+| 328_stage3_stage3_1_Reshape_1 | Reshape | 8 |
+| 38_stage2_stage2_0_Reshape | Reshape | 4 |
+| 49_stage2_stage2_0_Reshape_1 | Reshape | 4 |
+| 712_stage4_stage4_0_Reshape | Reshape | 4 |
+| 723_stage4_stage4_0_Reshape_1 | Reshape | 4 |
+| 186_stage2_stage2_3_Shape_1 | Shape | 19 |
+| 410_stage3_stage3_3_Shape_2 | Shape | 39 |
+| 808_stage4_stage4_2_Shape_3 | Shape | 19 |
+| 339_stage3_stage3_2_Slice | Slice | 14 |
+| 63_stage2_stage2_1_Slice_1 | Slice | 6 |
+| 737_stage4_stage4_1_Slice_1 | Slice | 6 |
+| 39_stage2_stage2_0_Transpose | Transpose | 4 |
+| 550_stage3_stage3_5_Transpose | Transpose | 8 |
+| 771_stage4_stage4_1_Transpose | Transpose | 4 |
+| 893_stage4_stage4_3_Unsqueeze_6 | Unsqueeze | 128 |

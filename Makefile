@@ -101,8 +101,6 @@ ${LLVM_INSTALL_DIR}: ${TOOLCHAIN_DIR}/llvm-project
 	-DLLVM_OPTIMIZED_TABLEGEN=ON \
 	-DLLVM_PARALLEL_LINK_JOBS=2 \
 	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_C_COMPILER_LAUNCHER=ccache \
-	-DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
 	../llvm && \
 	${CMAKE} --build . -j && \
 	${CMAKE} --install .

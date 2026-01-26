@@ -1,0 +1,59 @@
+# MobileNet v2 x0.35 Layer Deduplication Report
+
+This table shows the unique layer configurations and their occurrence counts.
+
+| Layer Name | Layer Type | Occurrences |
+|------------|------------|-------------|
+| 139_features_features_14_Add | Add | 3 |
+| 20_features_features_1_Add | Add | 3 |
+| 57_features_features_5_Add | Add | 7 |
+| 122_features_features_12_Concat_2 | Concat | 1 |
+| 12_features_features_0_Concat_2 | Concat | 1 |
+| 49_features_features_4_Concat_2 | Concat | 1 |
+| 00_first_conv_first_conv_0_Conv | Conv | 1 |
+| 03_features_features_0_branch_main_1_branch_main_1_0_Conv | Conv | 1 |
+| 05_features_features_0_branch_main_1_branch_main_1_3_Conv | DWConv | 1 |
+| 09_features_features_0_branch_main_2_branch_main_2_0_Conv | DWConv | 1 |
+| 10_features_features_0_branch_proj_Conv | DWConv | 1 |
+| 113_features_features_12_branch_main_1_branch_main_1_0_Conv | DWConv | 1 |
+| 115_features_features_12_branch_main_1_branch_main_1_3_Conv | DWConv | 1 |
+| 119_features_features_12_branch_main_2_branch_main_2_0_Conv | DWConv | 1 |
+| 120_features_features_12_branch_proj_Conv | DWConv | 1 |
+| 138_features_features_14_branch_main_2_branch_main_2_0_Conv | DWConv | 3 |
+| 141_features_features_15_branch_main_1_branch_main_1_0_Conv | DWConv | 3 |
+| 143_features_features_15_branch_main_1_branch_main_1_3_Conv | DWConv | 3 |
+| 19_features_features_1_branch_main_2_branch_main_2_0_Conv | DWConv | 3 |
+| 24_features_features_2_branch_main_1_branch_main_1_3_Conv | DWConv | 3 |
+| 31_features_features_3_branch_main_1_branch_main_1_0_Conv | DWConv | 3 |
+| 40_features_features_4_branch_main_1_branch_main_1_0_Conv | DWConv | 1 |
+| 42_features_features_4_branch_main_1_branch_main_1_3_Conv | DWConv | 1 |
+| 46_features_features_4_branch_main_2_branch_main_2_0_Conv | DWConv | 1 |
+| 47_features_features_4_branch_proj_Conv | DWConv | 1 |
+| 56_features_features_5_branch_main_2_branch_main_2_0_Conv | DWConv | 7 |
+| 61_features_features_6_branch_main_1_branch_main_1_3_Conv | DWConv | 7 |
+| 86_features_features_9_branch_main_1_branch_main_1_0_Conv | DWConv | 7 |
+| 152_classifier_classifier_0_MatMul | MatMul | 1 |
+| 02_maxpool_MaxPool | MaxPool | 1 |
+| 150_ReduceMean | ReduceMean | 1 |
+| 01_first_conv_first_conv_2_Relu | Relu | 1 |
+| 04_features_features_0_branch_main_1_branch_main_1_2_Relu | Relu | 1 |
+| 112_features_features_11_Relu | Relu | 7 |
+| 114_features_features_12_branch_main_1_branch_main_1_2_Relu | Relu | 2 |
+| 11_features_features_0_Relu | Relu | 1 |
+| 121_features_features_12_Relu | Relu | 1 |
+| 124_features_features_13_branch_main_1_branch_main_1_2_Relu | Relu | 3 |
+| 140_features_features_14_Relu | Relu | 3 |
+| 32_features_features_3_branch_main_1_branch_main_1_2_Relu | Relu | 3 |
+| 39_features_features_3_Relu | Relu | 3 |
+| 41_features_features_4_branch_main_1_branch_main_1_2_Relu | Relu | 1 |
+| 51_features_features_5_branch_main_1_branch_main_1_2_Relu | Relu | 7 |
+| 06_features_features_0_Reshape | Reshape | 4 |
+| 100_features_features_10_Reshape_1 | Reshape | 8 |
+| 116_features_features_12_Reshape | Reshape | 4 |
+| 137_features_features_14_Reshape_1 | Reshape | 4 |
+| 151_Reshape | Reshape | 1 |
+| 36_features_features_3_Reshape_1 | Reshape | 4 |
+| 98_features_features_10_Reshape | Reshape | 8 |
+| 136_features_features_14_Transpose | Transpose | 4 |
+| 17_features_features_1_Transpose | Transpose | 4 |
+| 63_features_features_6_Transpose | Transpose | 8 |
