@@ -75,11 +75,6 @@ class PULPFPConv2DParser(Conv2DParser):
                 # Current PULP kernel only supports grouping of 1
                 self.operatorRepresentation['group'] == 1,
 
-                # Make sure padding is square
-                self.operatorRepresentation['pads'][0] == self.operatorRepresentation['pads'][2],
-                self.operatorRepresentation['pads'][1] == self.operatorRepresentation['pads'][3],
-                self.operatorRepresentation['pads'][0] == self.operatorRepresentation['pads'][1],
-
                 # Check number of inputs
                 # 2 inputs if no bias, 3 if layer has bias
                 len(node.inputs) in [2, 3],
@@ -133,11 +128,6 @@ class PULPFPDWConv2DParser(Conv2DParser):
         if wellFormed:
             # Check if the node is a depthwise convolution
             ret = all([
-                # Make sure padding is square
-                self.operatorRepresentation['pads'][0] == self.operatorRepresentation['pads'][2],
-                self.operatorRepresentation['pads'][1] == self.operatorRepresentation['pads'][3],
-                self.operatorRepresentation['pads'][0] == self.operatorRepresentation['pads'][1],
-
                 # Check number of inputs
                 # 2 inputs if no bias, 3 if layer has bias
                 len(node.inputs) in [2, 3],
