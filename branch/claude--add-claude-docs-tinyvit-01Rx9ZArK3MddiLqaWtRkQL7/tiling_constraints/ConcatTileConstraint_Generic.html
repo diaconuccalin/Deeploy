@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concat Tiling Constraints - Generic &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Concat Tiling Constraints - Generic</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/ConcatTileConstraint_Generic.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="concat-tiling-constraints-generic">
+<h1>Concat Tiling Constraints - Generic<a class="headerlink" href="#concat-tiling-constraints-generic" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/ConcatTileConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">ConcatTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#visual-explanation"><span class="xref myst">Visual Explanation</span></a></p></li>
+<li><p><a class="reference internal" href="#examples"><span class="xref myst">Examples</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ConcatTileConstraint</span></code> handles the concatenation of two input tensors along a specified axis. The constraint ensures that dimensions match appropriately and enforces that tiling does not split the concatenation axis or any subsequent dimensions, as this would complicate the interleaved memory layout.</p>
+</section>
+<section id="supported-operations">
+<h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>ONNX Concat operator (limited to 2 inputs in this implementation)</p></li>
+</ul>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Inherits from:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in_1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_0,</span> <span class="pre">...,</span> <span class="pre">D_axis,</span> <span class="pre">...,</span> <span class="pre">D_n]</span></code></p></td>
+<td><p>First input tensor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_in_2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_0,</span> <span class="pre">...,</span> <span class="pre">D_axis',</span> <span class="pre">...,</span> <span class="pre">D_n]</span></code></p></td>
+<td><p>Second input tensor (differs only at axis)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_0,</span> <span class="pre">...,</span> <span class="pre">D_axis</span> <span class="pre">+</span> <span class="pre">D_axis',</span> <span class="pre">...,</span> <span class="pre">D_n]</span></code></p></td>
+<td><p>Concatenated output tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in_1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of first input buffer in context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_in_2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of second input buffer in context</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer in context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">axis</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Axis along which to concatenate (supports negative indexing)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>Geometrical constraints define the mathematical relationships between tensor dimensions that must hold for correct concatenation.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Dimension Index</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputDim1Var[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in_1</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Dimension i of first input</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">inputDim2Var[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in_2</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Dimension i of second input</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">outputDimVar[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Dimension i of output</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="non-axis-dimension-equality">
+<h4>Non-Axis Dimension Equality<a class="headerlink" href="#non-axis-dimension-equality" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="nb">all</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">posAxis</span><span class="p">:</span>
+    <span class="n">inputDim1Var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">outputDimVar</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">inputDim2Var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">inputDim1Var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> All dimensions except the concatenation axis must be equal across both inputs and the output.</p>
+</section>
+<hr class="docutils" />
+<section id="concatenation-axis-constraint">
+<h4>Concatenation Axis Constraint<a class="headerlink" href="#concatenation-axis-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputDim1Var</span><span class="p">[</span><span class="n">posAxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">inputDim2Var</span><span class="p">[</span><span class="n">posAxis</span><span class="p">]</span> <span class="o">==</span> <span class="n">outputDimVar</span><span class="p">[</span><span class="n">posAxis</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> The output dimension at the concatenation axis equals the sum of the two input dimensions at that axis.</p>
+</section>
+<hr class="docutils" />
+<section id="no-tiling-constraint-for-axis-and-subsequent-dimensions">
+<h4>No-Tiling Constraint for Axis and Subsequent Dimensions<a class="headerlink" href="#no-tiling-constraint-for-axis-and-subsequent-dimensions" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="nb">all</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">posAxis</span><span class="p">:</span>
+    <span class="n">inputDim1Var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">input1Shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="p">(</span><span class="n">full</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">no</span> <span class="n">tiling</span><span class="p">)</span>
+    <span class="n">outputDimVar</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">outputShape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>   <span class="p">(</span><span class="n">full</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">no</span> <span class="n">tiling</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Dimensions from the concatenation axis onward cannot be tiled. This ensures that the memory layout remains contiguous and the concatenation can be performed correctly without complex index remapping.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p><strong>Implicit in Geometrical Constraints.</strong> The no-tiling constraint for axis and subsequent dimensions serves as both a geometrical and policy constraint. The rationale is:</p>
+<ol class="arabic simple">
+<li><p><strong>Memory contiguity:</strong> Tiling along the concatenation axis would split the data that needs to be interleaved.</p></li>
+<li><p><strong>Transfer efficiency:</strong> The implementation uses contiguous memory transfers for the elements after the axis.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="input-cube-computation">
+<h3>Input Cube Computation<a class="headerlink" href="#input-cube-computation" title="Link to this heading"></a></h3>
+<p>For each output cube, compute the corresponding input cubes:</p>
+<p><strong>Algorithm:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">output_cube</span> <span class="ow">in</span> <span class="n">output_cubes</span><span class="p">:</span>
+    <span class="n">in1_cube</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">output_cube</span><span class="p">)</span>
+    <span class="n">in2_cube</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">output_cube</span><span class="p">)</span>
+
+    <span class="c1"># Replace concatenation axis dimension with original input sizes</span>
+    <span class="n">in1_cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">in1Shape</span><span class="p">[</span><span class="n">posAxis</span><span class="p">],</span> <span class="o">*</span><span class="n">in1_cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">in2_cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">in2Shape</span><span class="p">[</span><span class="n">posAxis</span><span class="p">],</span> <span class="o">*</span><span class="n">in2_cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+</div>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_in_1&quot;</span><span class="p">:</span> <span class="n">In1Cube</span><span class="p">,</span> <span class="s2">&quot;data_in_2&quot;</span><span class="p">:</span> <span class="n">In2Cube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">OutCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<p>Variables that are replaced with tile-specific values during code generation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">iterations</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Number of iterations (product of dims before axis)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">in1TransferLength</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Bytes to transfer per iteration from input 1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">in2TransferLength</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Bytes to transfer per iteration from input 2</p></td>
+</tr>
+</tbody>
+</table>
+<section id="replacement-computation">
+<h3>Replacement Computation<a class="headerlink" href="#replacement-computation" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">cube</span> <span class="ow">in</span> <span class="n">outputCubes</span><span class="p">:</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[:</span><span class="n">axis</span><span class="p">])</span>
+
+    <span class="n">in1TransferLength</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">in1Cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="p">:])</span> <span class="o">*</span> <span class="n">elementSize_in1</span>
+    <span class="n">in2TransferLength</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">in2Cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">posAxis</span><span class="p">:])</span> <span class="o">*</span> <span class="n">elementSize_in2</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="visual-explanation">
+<h2>Visual Explanation<a class="headerlink" href="#visual-explanation" title="Link to this heading"></a></h2>
+<section id="concatenation-along-axis-1-height">
+<h3>Concatenation Along Axis 1 (Height)<a class="headerlink" href="#concatenation-along-axis-1-height" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Input 1 [1, 4, 8, 3]          Input 2 [1, 2, 8, 3]
+┌─────────────────┐           ┌─────────────┐
+│                 │           │             │
+│    H=4          │           │    H=2      │
+│                 │           │             │
+└─────────────────┘           └─────────────┘
+          │                          │
+          └──────────┬───────────────┘
+                     ↓
+           Output [1, 6, 8, 3]
+           ┌─────────────────┐
+           │                 │
+           │    H=6          │
+           │  (4 + 2)        │
+           └─────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="tiling-restriction">
+<h3>Tiling Restriction<a class="headerlink" href="#tiling-restriction" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Allowed</span> <span class="n">Tiling</span> <span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="o">-</span> <span class="n">Tile</span> <span class="n">along</span> <span class="n">dimension</span> <span class="mi">0</span> <span class="p">(</span><span class="n">Batch</span><span class="p">):</span> <span class="n">OK</span>
+<span class="o">-</span> <span class="n">Tile</span> <span class="n">along</span> <span class="n">dimension</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Height</span><span class="p">):</span> <span class="n">NOT</span> <span class="n">ALLOWED</span> <span class="p">(</span><span class="n">concat</span> <span class="n">axis</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">Tile</span> <span class="n">along</span> <span class="n">dimension</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Width</span><span class="p">):</span> <span class="n">NOT</span> <span class="n">ALLOWED</span> <span class="p">(</span><span class="n">after</span> <span class="n">axis</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">Tile</span> <span class="n">along</span> <span class="n">dimension</span> <span class="mi">3</span> <span class="p">(</span><span class="n">Channel</span><span class="p">):</span> <span class="n">NOT</span> <span class="n">ALLOWED</span> <span class="p">(</span><span class="n">after</span> <span class="n">axis</span><span class="p">)</span>
+
+<span class="n">For</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">only</span> <span class="n">dimension</span> <span class="mi">0</span> <span class="n">can</span> <span class="n">be</span> <span class="n">tiled</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="example-1-batch-tiling">
+<h3>Example 1: Batch Tiling<a class="headerlink" href="#example-1-batch-tiling" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input 1 shape: <code class="docutils literal notranslate"><span class="pre">[8,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+<li><p>Input 2 shape: <code class="docutils literal notranslate"><span class="pre">[8,</span> <span class="pre">16,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+<li><p>Axis: 1 (height)</p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[8,</span> <span class="pre">48,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+</ul>
+<p><strong>Tiling (along batch):</strong></p>
+<ul class="simple">
+<li><p>Output Tile 0: Shape <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">48,</span> <span class="pre">32,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Output Tile 1: Shape <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">48,</span> <span class="pre">32,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+</ul>
+<p><strong>Input Tiles for Tile 0:</strong></p>
+<ul class="simple">
+<li><p>Input 1 Tile: Shape <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+<li><p>Input 2 Tile: Shape <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">16,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+</ul>
+<p><strong>Replacements for Tile 0:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">iterations</span> <span class="pre">=</span> <span class="pre">4</span></code> (batch dimension)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in1TransferLength</span> <span class="pre">=</span> <span class="pre">32</span> <span class="pre">*</span> <span class="pre">32</span> <span class="pre">*</span> <span class="pre">64</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code> = 65536 bytes (for int8)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in2TransferLength</span> <span class="pre">=</span> <span class="pre">16</span> <span class="pre">*</span> <span class="pre">32</span> <span class="pre">*</span> <span class="pre">64</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code> = 32768 bytes (for int8)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="example-2-channel-concatenation-axis-1">
+<h3>Example 2: Channel Concatenation (axis=-1)<a class="headerlink" href="#example-2-channel-concatenation-axis-1" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input 1 shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">16,</span> <span class="pre">16,</span> <span class="pre">32]</span></code></p></li>
+<li><p>Input 2 shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">16,</span> <span class="pre">16,</span> <span class="pre">64]</span></code></p></li>
+<li><p>Axis: -1 (or 3, channel)</p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">16,</span> <span class="pre">16,</span> <span class="pre">96]</span></code></p></li>
+</ul>
+<p><strong>Tiling Restrictions:</strong></p>
+<ul class="simple">
+<li><p>Cannot tile along any dimension (axis is the last dimension)</p></li>
+<li><p>Full tensor must fit in L1</p></li>
+</ul>
+<p><strong>Replacements:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">iterations</span> <span class="pre">=</span> <span class="pre">1</span> <span class="pre">*</span> <span class="pre">16</span> <span class="pre">*</span> <span class="pre">16</span> <span class="pre">=</span> <span class="pre">256</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in1TransferLength</span> <span class="pre">=</span> <span class="pre">32</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in2TransferLength</span> <span class="pre">=</span> <span class="pre">64</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="example-3-no-tiling-required">
+<h3>Example 3: No Tiling Required<a class="headerlink" href="#example-3-no-tiling-required" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input 1 shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">8,</span> <span class="pre">8,</span> <span class="pre">16]</span></code></p></li>
+<li><p>Input 2 shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">4,</span> <span class="pre">8,</span> <span class="pre">16]</span></code></p></li>
+<li><p>Axis: 1</p></li>
+<li><p>L1 Memory: Sufficient for full tensors</p></li>
+</ul>
+<p><strong>Result:</strong></p>
+<ul class="simple">
+<li><p>Single tile covering entire tensor</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">iterations</span> <span class="pre">=</span> <span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in1TransferLength</span> <span class="pre">=</span> <span class="pre">8</span> <span class="pre">*</span> <span class="pre">8</span> <span class="pre">*</span> <span class="pre">16</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in2TransferLength</span> <span class="pre">=</span> <span class="pre">4</span> <span class="pre">*</span> <span class="pre">8</span> <span class="pre">*</span> <span class="pre">16</span> <span class="pre">*</span> <span class="pre">sizeof(element)</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="known-limitations">
+<h3>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Two inputs only:</strong> This implementation supports exactly 2 input tensors. For more inputs, multiple concat operations must be chained.</p></li>
+<li><p><strong>No tiling along concat axis:</strong> The concatenation axis and all subsequent dimensions cannot be tiled. This may limit memory efficiency for large tensors.</p></li>
+<li><p><strong>Memory requirements:</strong> All data from axis onward must fit in L1 for both inputs combined.</p></li>
+</ol>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Choose concat axis wisely:</strong> Earlier axes (lower indices) allow more tiling flexibility.</p></li>
+<li><p><strong>Transfer length optimization:</strong> The implementation transfers contiguous chunks per iteration, which is efficient for DMA.</p></li>
+<li><p><strong>Consider tensor layout:</strong> NHWC layout with channel concatenation (axis=3) allows no tiling, while batch concatenation (axis=0) allows full flexibility.</p></li>
+</ol>
+</section>
+<section id="common-use-cases">
+<h3>Common Use Cases<a class="headerlink" href="#common-use-cases" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Skip connections in CNNs (concatenating feature maps)</p></li>
+<li><p>Multi-head attention output concatenation</p></li>
+<li><p>Feature pyramid networks</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/ConcatTileConstraint.py</span></code></p></li>
+<li><p>Related templates: Concat templates in target-specific Template directories</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

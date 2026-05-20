@@ -1,0 +1,38 @@
+.. SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
+..
+.. SPDX-License-Identifier: Apache-2.0
+
+Deeploy.TilingExtension.TileConstraintDebugger.ConstraintInfo
+=============================================================
+
+.. currentmodule:: Deeploy.TilingExtension.TileConstraintDebugger
+
+.. autoclass:: ConstraintInfo
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   .. rubric:: Methods
+   .. automethod:: __init__
+
+   .. autosummary::
+   
+      ~ConstraintInfo.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ConstraintInfo.is_satisfied
+      ~ConstraintInfo.related_variables
+      ~ConstraintInfo.constraint_type
+      ~ConstraintInfo.expression
+      ~ConstraintInfo.description
+   
+   

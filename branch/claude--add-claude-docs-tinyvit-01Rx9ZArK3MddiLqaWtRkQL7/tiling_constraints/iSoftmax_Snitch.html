@@ -1,0 +1,440 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iSoftmax Tiling Constraints - Snitch &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">iSoftmax Tiling Constraints - Snitch</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/iSoftmax_Snitch.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="isoftmax-tiling-constraints-snitch">
+<h1>iSoftmax Tiling Constraints - Snitch<a class="headerlink" href="#isoftmax-tiling-constraints-snitch" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/TileConstraints/iSoftmaxTileConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">iSoftmaxTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>This constraint class defines tiling rules for the integer/incremental Softmax operation on the Snitch platform. The iSoftmax operation computes the softmax function over the last dimension of the input tensor. The constraint ensures that the last dimension (reduction axis) is not tiled, as softmax requires the complete sequence for normalization.</p>
+</section>
+<section id="supported-data-types">
+<h3>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input Type</p></th>
+<th class="head"><p>Output Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int32_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int32_t</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Extends:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[d0,</span> <span class="pre">d1,</span> <span class="pre">...,</span> <span class="pre">dn]</span></code></p></td>
+<td><p>N-dimensional</p></td>
+<td><p>Input tensor (any dimensionality)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[d0,</span> <span class="pre">d1,</span> <span class="pre">...,</span> <span class="pre">dn]</span></code></p></td>
+<td><p>N-dimensional</p></td>
+<td><p>Output tensor (same shape as input)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of input buffer in context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer in context</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>Geometrical constraints define the mathematical relationships between tensor dimensions that must hold for correct operation.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Dimension Index</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputDim[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Input dimension at index i</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputDim[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Output dimension at index i</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="element-wise-dimension-constraint">
+<h4>Element-wise Dimension Constraint<a class="headerlink" href="#element-wise-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="nb">all</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shapeLen</span><span class="p">):</span>
+    <span class="n">outputDim</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">inputDim</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> This is an element-wise operation (softmax). All input and output dimensions must match exactly. The output tensor has the same shape as the input tensor.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p>Policy constraints define restrictions required for the softmax algorithm to produce correct results.</p>
+<section id="id1">
+<h3>Constraints<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="full-last-dimension-constraint">
+<h4>Full Last Dimension Constraint<a class="headerlink" href="#full-last-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lastDimVar</span> <span class="o">==</span> <span class="n">lastDimLength</span>
+</pre></div>
+</div>
+<p><strong>Where:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lastDimVar</span></code> = <code class="docutils literal notranslate"><span class="pre">tilerModel.getTensorDimVar(inputBufferName,</span> <span class="pre">lastDimIdx)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lastDimLength</span></code> = <code class="docutils literal notranslate"><span class="pre">inputBuffer.shape[-1]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lastDimIdx</span></code> = <code class="docutils literal notranslate"><span class="pre">len(inputBuffer.shape)</span> <span class="pre">-</span> <span class="pre">1</span></code></p></li>
+</ul>
+<p><strong>Rationale:</strong> The softmax operation computes normalized exponentials over the last dimension. This requires:</p>
+<ol class="arabic simple">
+<li><p>Finding the maximum value across the last dimension</p></li>
+<li><p>Computing exponentials relative to the maximum</p></li>
+<li><p>Summing all exponentials for normalization</p></li>
+</ol>
+<p>Tiling the last dimension would prevent correct normalization since partial sums would not equal the full normalization constant.</p>
+<p><strong>Priority:</strong> Hard constraint (must be satisfied)</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="input-cube-computation">
+<h3>Input Cube Computation<a class="headerlink" href="#input-cube-computation" title="Link to this heading"></a></h3>
+<p>Since iSoftmax is element-wise with the constraint that the last dimension must be full, input and output cubes are identical:</p>
+<p><strong>Algorithm:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">each</span> <span class="n">output</span> <span class="n">tile</span> <span class="n">cube</span><span class="p">:</span>
+    <span class="c1"># Input cube matches output cube exactly</span>
+    <span class="n">inputCube</span> <span class="o">=</span> <span class="n">outputCube</span>
+</pre></div>
+</div>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_in&quot;</span><span class="p">:</span> <span class="n">outputCube</span><span class="p">},</span>  <span class="c1"># Same as output cube</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">outputCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<p>Variables that are replaced with tile-specific values during code generation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lastDimLength</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Length of the last dimension (always full)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">size</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Total number of elements in the tile (product of all dimensions)</p></td>
+</tr>
+</tbody>
+</table>
+<section id="symbolic-node-representation">
+<h3>Symbolic Node Representation<a class="headerlink" href="#symbolic-node-representation" title="Link to this heading"></a></h3>
+<p>The constraint also constructs a symbolic representation that includes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">symbolicParseDict</span><span class="p">[</span><span class="s1">&#39;lastDimLength&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tilerModel</span><span class="o">.</span><span class="n">getTensorDimVar</span><span class="p">(</span><span class="n">inputBuffer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">lastDimIdx</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="known-limitations">
+<h3>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>No tiling on last dimension:</strong> The last dimension (softmax axis) cannot be tiled. The complete sequence must fit in memory for correct normalization.</p></li>
+<li><p><strong>Memory requirements:</strong> For large last dimensions, ensure sufficient L1 memory to hold the complete last dimension of both input and output.</p></li>
+<li><p><strong>Flexible dimensionality:</strong> The constraint supports tensors of any dimensionality, tiling on all dimensions except the last.</p></li>
+</ol>
+</section>
+<section id="platform-specific-notes">
+<h3>Platform-Specific Notes<a class="headerlink" href="#platform-specific-notes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Snitch cluster:</strong> The operation can be parallelized over the outer dimensions (all except the last).</p></li>
+<li><p><strong>Reduction operations:</strong> The max-finding and sum-reduction over the last dimension are performed sequentially within each tile.</p></li>
+</ul>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Maximize outer dimension tiles</strong> to improve parallelization across Snitch cores</p></li>
+<li><p><strong>Ensure last dimension fits in L1</strong> - this is a hard constraint</p></li>
+<li><p><strong>Consider memory bandwidth</strong> when choosing tile sizes for outer dimensions</p></li>
+<li><p><strong>Tile size calculation:</strong> The <code class="docutils literal notranslate"><span class="pre">size</span></code> replacement is <code class="docutils literal notranslate"><span class="pre">np.prod(cube.dims)</span></code>, representing total elements per tile</p></li>
+</ol>
+</section>
+<section id="tiling-strategy">
+<h3>Tiling Strategy<a class="headerlink" href="#tiling-strategy" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Input</span> <span class="n">Tensor</span> <span class="p">[</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span><span class="p">]</span>
+<span class="o">+---------------------------+</span>
+<span class="o">|</span>                           <span class="o">|</span>
+<span class="o">|</span>   <span class="o">+---------------+</span>       <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">Tile</span> <span class="mi">0</span>        <span class="o">|</span>  <span class="o">&lt;--</span> <span class="n">Can</span> <span class="n">tile</span> <span class="n">B</span><span class="p">,</span> <span class="n">S</span> <span class="n">dimensions</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">D</span> <span class="ow">is</span> <span class="n">full</span>     <span class="o">|</span>
+<span class="o">|</span>   <span class="o">+---------------+</span>       <span class="o">|</span>
+<span class="o">|</span>        <span class="o">|</span>                  <span class="o">|</span>
+<span class="o">|</span>   <span class="o">+---------------+</span>       <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">Tile</span> <span class="mi">1</span>        <span class="o">|</span>       <span class="o">|</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="n">D</span> <span class="ow">is</span> <span class="n">full</span>     <span class="o">|</span>       <span class="o">|</span>
+<span class="o">|</span>   <span class="o">+---------------+</span>       <span class="o">|</span>
+<span class="o">|</span>                           <span class="o">|</span>
+<span class="o">+---------------------------+</span>
+
+<span class="n">Last</span> <span class="n">dimension</span> <span class="n">D</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">tiled</span> <span class="p">(</span><span class="n">softmax</span> <span class="n">axis</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/TileConstraints/iSoftmaxTileConstraint.py</span></code></p></li>
+<li><p>Related templates: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/Templates/iSoftmaxTemplate.py</span></code></p></li>
+<li><p>Tiler configuration: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/Tiler.py</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transpose Tiling Constraints - Generic &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Transpose Tiling Constraints - Generic</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/TransposeTileConstraint_Generic.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="transpose-tiling-constraints-generic">
+<h1>Transpose Tiling Constraints - Generic<a class="headerlink" href="#transpose-tiling-constraints-generic" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/TransposeTileConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">TransposeTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#visual-explanation"><span class="xref myst">Visual Explanation</span></a></p></li>
+<li><p><a class="reference internal" href="#examples"><span class="xref myst">Examples</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">TransposeTileConstraint</span></code> handles tensor transposition (dimension permutation) operations. It establishes the relationship between input and output dimensions based on a permutation vector and computes input cubes by applying the inverse permutation to output cubes.</p>
+</section>
+<section id="supported-operations">
+<h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>ONNX Transpose operator</p></li>
+<li><p>Dimension permutation/reordering</p></li>
+</ul>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Inherits from:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_0,</span> <span class="pre">D_1,</span> <span class="pre">...,</span> <span class="pre">D_n]</span></code></p></td>
+<td><p>Input tensor before transposition</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_perm[0],</span> <span class="pre">D_perm[1],</span> <span class="pre">...,</span> <span class="pre">D_perm[n]]</span></code></p></td>
+<td><p>Transposed output tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of input buffer in context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer in context</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">perm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">List[int]</span></code></p></td>
+<td><p>Permutation vector (e.g., <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">1]</span></code> swaps dims 1 and 2)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>Geometrical constraints define how input and output dimensions relate through the permutation.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Dimension Index</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputDimVar[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Dimension i of input tensor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputDimVar[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>i</p></td>
+<td><p>Dimension i of output tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="permutation-constraint">
+<h4>Permutation Constraint<a class="headerlink" href="#permutation-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="nb">all</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="n">outputDimVar</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">inputDimVar</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Each output dimension corresponds to an input dimension as specified by the permutation vector. If <code class="docutils literal notranslate"><span class="pre">perm</span> <span class="pre">=</span> <span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">1]</span></code>, then:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">outputDim[0]</span> <span class="pre">=</span> <span class="pre">inputDim[0]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">outputDim[1]</span> <span class="pre">=</span> <span class="pre">inputDim[2]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">outputDim[2]</span> <span class="pre">=</span> <span class="pre">inputDim[1]</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p><strong>None.</strong> The <code class="docutils literal notranslate"><span class="pre">TransposeTileConstraint</span></code> does not impose additional policy constraints. Tiling can occur along any dimension.</p>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="input-cube-computation">
+<h3>Input Cube Computation<a class="headerlink" href="#input-cube-computation" title="Link to this heading"></a></h3>
+<p>The input cube for each output tile is computed by applying the inverse permutation to the output cube dimensions and offsets.</p>
+<p><strong>Algorithm:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">invPerm</span> <span class="o">=</span> <span class="n">invertPermutation</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">output_cube</span> <span class="ow">in</span> <span class="n">output_cubes</span><span class="p">:</span>
+    <span class="n">input_cube</span> <span class="o">=</span> <span class="n">permuteHyperRectangle</span><span class="p">(</span><span class="n">output_cube</span><span class="p">,</span> <span class="n">invPerm</span><span class="p">)</span>
+    <span class="c1"># input_cube.dims[i] = output_cube.dims[invPerm[i]]</span>
+    <span class="c1"># input_cube.offset[i] = output_cube.offset[invPerm[i]]</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<ul class="simple">
+<li><p>Permutation: <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">1]</span></code> (swap dims 1 and 2)</p></li>
+<li><p>Inverse permutation: <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">1]</span></code> (same in this case)</p></li>
+<li><p>Output cube: dims <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">8,</span> <span class="pre">16]</span></code>, offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Input cube: dims <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">16,</span> <span class="pre">8]</span></code>, offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+</ul>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_in&quot;</span><span class="p">:</span> <span class="n">InCube</span><span class="p">},</span>  <span class="c1"># Permuted from output cube</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">OutCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<p>Variables that are replaced with tile-specific values during code generation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dimLen_0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input dimension 0 for each tile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dimLen_1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input dimension 1 for each tile</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dimLen_{N-1}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input dimension N-1 for each tile</p></td>
+</tr>
+</tbody>
+</table>
+<section id="replacement-computation">
+<h3>Replacement Computation<a class="headerlink" href="#replacement-computation" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">numDims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numDims</span><span class="p">):</span>
+    <span class="n">replacements</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;dimLen_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">output_cube</span> <span class="ow">in</span> <span class="n">output_cubes</span><span class="p">:</span>
+    <span class="n">input_cube</span> <span class="o">=</span> <span class="n">permuteHyperRectangle</span><span class="p">(</span><span class="n">output_cube</span><span class="p">,</span> <span class="n">invPerm</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_cube</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
+        <span class="n">replacements</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;dimLen_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="visual-explanation">
+<h2>Visual Explanation<a class="headerlink" href="#visual-explanation" title="Link to this heading"></a></h2>
+<section id="transpose-operation">
+<h3>Transpose Operation<a class="headerlink" href="#transpose-operation" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Input</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>                    <span class="n">Output</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">perm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+  <span class="n">Dim</span> <span class="mi">0</span>   <span class="n">Dim</span> <span class="mi">1</span>   <span class="n">Dim</span> <span class="mi">2</span>            <span class="n">Dim</span> <span class="mi">0</span>   <span class="n">Dim</span> <span class="mi">1</span>   <span class="n">Dim</span> <span class="mi">2</span>
+    <span class="mi">2</span>   <span class="n">x</span>   <span class="mi">3</span>   <span class="n">x</span>   <span class="mi">4</span>       <span class="o">-&gt;</span>       <span class="mi">2</span>   <span class="n">x</span>   <span class="mi">4</span>   <span class="n">x</span>   <span class="mi">3</span>
+
+    <span class="n">Input</span> <span class="n">dims</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>              <span class="n">Output</span> <span class="n">dims</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">invPerm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="tile-mapping">
+<h3>Tile Mapping<a class="headerlink" href="#tile-mapping" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Output Tile                        Input Tile (via inverse perm)
+┌─────────────┐                    ┌─────────────┐
+│ dims=[1,4,3]│      invPerm       │ dims=[1,3,4]│
+│ off=[0,0,0] │  ─────────────&gt;    │ off=[0,0,0] │
+└─────────────┘                    └─────────────┘
+
+Output element at (n, h, w)  &lt;-&gt;  Input element at (n, w, h)
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="example-1-simple-dimension-swap-3d">
+<h3>Example 1: Simple Dimension Swap (3D)<a class="headerlink" href="#example-1-simple-dimension-swap-3d" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">128]</span></code></p></li>
+<li><p>Permutation: <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">1]</span></code> (swap dims 1 and 2)</p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">128,</span> <span class="pre">64]</span></code></p></li>
+</ul>
+<p><strong>Tiling (along output dim 1):</strong></p>
+<ul class="simple">
+<li><p>Output Tile 0: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Output Tile 1: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">64,</span> <span class="pre">0]</span></code></p></li>
+</ul>
+<p><strong>Input Tiles (via inverse permutation):</strong></p>
+<ul class="simple">
+<li><p>Input Tile 0: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Input Tile 1: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">64]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">64]</span></code></p></li>
+</ul>
+<p><strong>Replacements for Tile 0:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_0</span> <span class="pre">=</span> <span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_1</span> <span class="pre">=</span> <span class="pre">64</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_2</span> <span class="pre">=</span> <span class="pre">64</span></code></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="example-2-nhwc-to-nchw-conversion-4d">
+<h3>Example 2: NHWC to NCHW Conversion (4D)<a class="headerlink" href="#example-2-nhwc-to-nchw-conversion-4d" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">64]</span></code> (NHWC)</p></li>
+<li><p>Permutation: <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">3,</span> <span class="pre">1,</span> <span class="pre">2]</span></code> (NHWC -&gt; NCHW)</p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">64,</span> <span class="pre">32,</span> <span class="pre">32]</span></code> (NCHW)</p></li>
+</ul>
+<p><strong>Inverse Permutation:</strong> <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">1]</span></code></p>
+<p><strong>Tiling (along output channel dimension):</strong></p>
+<ul class="simple">
+<li><p>Output Tile 0: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">32]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Output Tile 1: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">32]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">32,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+</ul>
+<p><strong>Input Tiles:</strong></p>
+<ul class="simple">
+<li><p>Input Tile 0: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">32]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Input Tile 1: Shape <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">32]</span></code>, Offset <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">32]</span></code></p></li>
+</ul>
+<p>Note: Input tile offsets are permuted from output tile offsets.</p>
+<p><strong>Replacements for Tile 0:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_0</span> <span class="pre">=</span> <span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_1</span> <span class="pre">=</span> <span class="pre">32</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_2</span> <span class="pre">=</span> <span class="pre">32</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_3</span> <span class="pre">=</span> <span class="pre">32</span></code></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="example-3-no-tiling-required">
+<h3>Example 3: No Tiling Required<a class="headerlink" href="#example-3-no-tiling-required" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input shape: <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">4,</span> <span class="pre">8]</span></code></p></li>
+<li><p>Permutation: <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">1,</span> <span class="pre">0]</span></code> (reverse all dimensions)</p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[8,</span> <span class="pre">4,</span> <span class="pre">2]</span></code></p></li>
+<li><p>L1 Memory: Sufficient for full tensor</p></li>
+</ul>
+<p><strong>Result:</strong></p>
+<ul class="simple">
+<li><p>Single tile covering entire tensor</p></li>
+<li><p>Input cube: <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">4,</span> <span class="pre">8]</span></code></p></li>
+<li><p>Output cube: <code class="docutils literal notranslate"><span class="pre">[8,</span> <span class="pre">4,</span> <span class="pre">2]</span></code></p></li>
+</ul>
+<p><strong>Replacements:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_0</span> <span class="pre">=</span> <span class="pre">2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_1</span> <span class="pre">=</span> <span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dimLen_2</span> <span class="pre">=</span> <span class="pre">8</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="key-characteristics">
+<h3>Key Characteristics<a class="headerlink" href="#key-characteristics" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Flexible tiling:</strong> Can tile along any dimension since the permutation relationship is maintained per-tile.</p></li>
+<li><p><strong>Non-contiguous memory access:</strong> Transpose operations typically involve strided memory access patterns, which can be less efficient than contiguous access.</p></li>
+<li><p><strong>Dimension count preserved:</strong> Input and output always have the same number of dimensions.</p></li>
+</ol>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Memory access patterns:</strong> Transposing can cause cache-unfriendly access. Larger tiles may help amortize overhead.</p></li>
+<li><p><strong>Tile size selection:</strong> Consider the target platform’s cache line size and memory alignment.</p></li>
+<li><p><strong>Avoid small inner dimensions:</strong> When the innermost dimension is small after transposition, memory bandwidth utilization may be poor.</p></li>
+</ol>
+</section>
+<section id="common-use-cases">
+<h3>Common Use Cases<a class="headerlink" href="#common-use-cases" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Layout conversion (NHWC &lt;-&gt; NCHW)</p></li>
+<li><p>Matrix transpose for GEMM optimization</p></li>
+<li><p>Attention mechanism reshape operations</p></li>
+<li><p>Preparing data for specific kernel requirements</p></li>
+</ul>
+</section>
+<section id="platform-specific-notes">
+<h3>Platform-Specific Notes<a class="headerlink" href="#platform-specific-notes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Some platforms may have optimized transpose kernels for specific permutations (e.g., 2D matrix transpose).</p></li>
+<li><p>DMA engines may support strided transfers that can accelerate certain transposition patterns.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/TransposeTileConstraint.py</span></code></p></li>
+<li><p>Helper functions: <code class="docutils literal notranslate"><span class="pre">_invertPermutation</span></code>, <code class="docutils literal notranslate"><span class="pre">_permuteHyperRectangle</span></code> from <code class="docutils literal notranslate"><span class="pre">LoweringOptimizationPasses.py</span></code></p></li>
+<li><p>Related operators: ONNX Transpose</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,688 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEMM Tiling Constraints - PULPOpen &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GEMM Tiling Constraints - PULPOpen</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/GEMM_PULPOpen.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="gemm-tiling-constraints-pulpopen">
+<h1>GEMM Tiling Constraints - PULPOpen<a class="headerlink" href="#gemm-tiling-constraints-pulpopen" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/PULPOpen/TileConstraints/GEMMTileConstraint.py</span></code>
+<strong>Classes:</strong> <code class="docutils literal notranslate"><span class="pre">GEMMTileConstraint</span></code>, <code class="docutils literal notranslate"><span class="pre">FloatGEMMTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-01-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#visual-explanation"><span class="xref myst">Visual Explanation</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>The GEMM (General Matrix Multiply) tiling constraint enables tiling of matrix multiplication operations: <code class="docutils literal notranslate"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">alpha</span> <span class="pre">*</span> <span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">beta</span> <span class="pre">*</span> <span class="pre">C</span></code>. It supports both requantized integer and floating-point variants with transposition options for input matrices.</p>
+</section>
+<section id="supported-variants">
+<h3>Supported Variants<a class="headerlink" href="#supported-variants" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Data Types</p></th>
+<th class="head"><p>Requantization</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GEMMTileConstraint</span></code></p></td>
+<td><p>Int8/Int32</p></td>
+<td><p>Yes (mul, add)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FloatGEMMTileConstraint</span></code></p></td>
+<td><p>Float32</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="matrix-dimensions-convention">
+<h3>Matrix Dimensions Convention<a class="headerlink" href="#matrix-dimensions-convention" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="p">:</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">]</span> <span class="p">(</span><span class="ow">or</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">]</span> <span class="k">if</span> <span class="n">transA</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">B</span><span class="p">:</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">O</span><span class="p">]</span> <span class="p">(</span><span class="ow">or</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">N</span><span class="p">]</span> <span class="k">if</span> <span class="n">transB</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">C</span><span class="p">:</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">O</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><strong>M</strong>: Number of rows in output</p></li>
+<li><p><strong>N</strong>: Inner/reduction dimension</p></li>
+<li><p><strong>O</strong>: Number of columns in output</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">M,</span> <span class="pre">N]</span></code> or <code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">N,</span> <span class="pre">M]</span></code></p></td>
+<td><p>Row-major</p></td>
+<td><p>First input matrix</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">N,</span> <span class="pre">O]</span></code> or <code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">O,</span> <span class="pre">N]</span></code></p></td>
+<td><p>Row-major</p></td>
+<td><p>Second input matrix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[O]</span></code> or <code class="docutils literal notranslate"><span class="pre">[M,</span> <span class="pre">O]</span></code></p></td>
+<td><p>Row-major</p></td>
+<td><p>Bias/accumulator (RQS: add buffer)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[O]</span></code></p></td>
+<td><p>Vector</p></td>
+<td><p>Requantization multiplier (RQS only)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">M,</span> <span class="pre">O]</span></code></p></td>
+<td><p>Row-major</p></td>
+<td><p>Output matrix</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of matrix A buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of matrix B buffer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of bias/accumulator buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mul</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of requantization multiplier (RQS)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">M</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Output rows</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Inner dimension</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">O</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Output columns</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Transpose A (0 or 1)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">transB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Transpose B (0 or 1)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AFirstDimVar</span></code></p></td>
+<td><p>A</p></td>
+<td><p>M dimension (or N if transA)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ASecondDimVar</span></code></p></td>
+<td><p>A</p></td>
+<td><p>N dimension (or M if transA)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BFirstDimVar</span></code></p></td>
+<td><p>B</p></td>
+<td><p>N dimension (or O if transB)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BSecondDimVar</span></code></p></td>
+<td><p>B</p></td>
+<td><p>O dimension (or N if transB)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">outputFirstDimVar</span></code></p></td>
+<td><p>data_out</p></td>
+<td><p>M dimension</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputSecondDimVar</span></code></p></td>
+<td><p>data_out</p></td>
+<td><p>O dimension</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mulDimVar</span></code></p></td>
+<td><p>mul</p></td>
+<td><p>Requant multiplier size (RQS)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">addDimVar</span></code></p></td>
+<td><p>C</p></td>
+<td><p>Bias/add buffer size</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="output-a-row-constraint">
+<h4>Output-A Row Constraint<a class="headerlink" href="#output-a-row-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputFirstDimVar</span> <span class="o">==</span> <span class="n">AFirstDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Output M dimension equals A’s first effective dimension.</p>
+<p><strong>Source:</strong> Line 48</p>
+</section>
+<hr class="docutils" />
+<section id="output-b-column-constraint">
+<h4>Output-B Column Constraint<a class="headerlink" href="#output-b-column-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputSecondDimVar</span> <span class="o">==</span> <span class="n">BSecondDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Output O dimension equals B’s second effective dimension.</p>
+<p><strong>Source:</strong> Line 49</p>
+</section>
+<hr class="docutils" />
+<section id="inner-dimension-constraint">
+<h4>Inner Dimension Constraint<a class="headerlink" href="#inner-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ASecondDimVar</span> <span class="o">==</span> <span class="n">BFirstDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> A’s columns (N) must equal B’s rows (N) - standard matrix multiplication requirement.</p>
+<p><strong>Source:</strong> Line 52</p>
+</section>
+<hr class="docutils" />
+<section id="requantization-dimension-constraints-rqs-only">
+<h4>Requantization Dimension Constraints (RQS only)<a class="headerlink" href="#requantization-dimension-constraints-rqs-only" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputSecondDimVar</span> <span class="o">==</span> <span class="n">mulDimVar</span>
+<span class="n">outputSecondDimVar</span> <span class="o">==</span> <span class="n">addDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Requantization vectors must match output columns (O dimension).</p>
+<p><strong>Source:</strong> Lines 57-58</p>
+</section>
+<hr class="docutils" />
+<section id="bias-dimension-constraints-float-only">
+<h4>Bias Dimension Constraints (Float only)<a class="headerlink" href="#bias-dimension-constraints-float-only" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputFirstDimVar</span> <span class="o">==</span> <span class="n">addDimVar_1</span>
+<span class="n">outputSecondDimVar</span> <span class="o">==</span> <span class="n">addDimVar_2</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> For float GEMM, bias C has shape [M, O] matching output.</p>
+<p><strong>Source:</strong> Lines 228-229</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<section id="inner-dimension-non-tiling">
+<h3>Inner Dimension Non-Tiling<a class="headerlink" href="#inner-dimension-non-tiling" title="Link to this heading"></a></h3>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ASecondDimVar</span> <span class="o">==</span> <span class="n">parseDict</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+<span class="n">BFirstDimVar</span> <span class="o">==</span> <span class="n">parseDict</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> The inner dimension N cannot be tiled to avoid partial accumulation results. Complete inner products must be computed in each tile.</p>
+<p><strong>Priority:</strong> Hard constraint</p>
+<p><strong>Source:</strong> Lines 80-81</p>
+</section>
+<hr class="docutils" />
+<section id="output-column-divisibility">
+<h3>Output Column Divisibility<a class="headerlink" href="#output-column-divisibility" title="Link to this heading"></a></h3>
+<p><strong>Proposition (when O &gt;= 16):</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BSecondDimVar</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> Performance optimization for SIMD vectorization.</p>
+<p><strong>Priority:</strong> Performance hint</p>
+<p><strong>Source:</strong> Lines 83-85</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="cube-computation">
+<h3>Cube Computation<a class="headerlink" href="#cube-computation" title="Link to this heading"></a></h3>
+<p>For each output tile, reconstruct corresponding input tiles:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">cube</span> <span class="ow">in</span> <span class="n">outputCubes</span><span class="p">:</span>
+    <span class="n">MOffset</span><span class="p">,</span> <span class="n">OOffset</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">MSize</span><span class="p">,</span> <span class="n">OSize</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+
+    <span class="c1"># A tile: [batch, M, N] (full N dimension)</span>
+    <span class="k">if</span> <span class="n">transA</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ACube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">MOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">MSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ACube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">NOffset</span><span class="p">,</span> <span class="n">MOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">NSize</span><span class="p">,</span> <span class="n">MSize</span><span class="p">))</span>
+
+    <span class="c1"># B tile: [batch, N, O] (full N dimension)</span>
+    <span class="k">if</span> <span class="n">transB</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">BCube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">NOffset</span><span class="p">,</span> <span class="n">OOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">NSize</span><span class="p">,</span> <span class="n">OSize</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">BCube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">OOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">OSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">))</span>
+
+    <span class="c1"># Requant tiles: just O dimension</span>
+    <span class="n">RequantCube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">OOffset</span><span class="p">,),</span> <span class="p">(</span><span class="n">OSize</span><span class="p">,))</span>
+</pre></div>
+</div>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RQS GEMM</span>
+<span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">ACube</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">BCube</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">AddCube</span><span class="p">,</span> <span class="s2">&quot;mul&quot;</span><span class="p">:</span> <span class="n">MulCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="c1"># Float GEMM</span>
+<span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">ACube</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">BCube</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">CCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">OutCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">M</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code></p></td>
+<td><p>Tiled output rows</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code></p></td>
+<td><p>Inner dimension (always full)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">O</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code></p></td>
+<td><p>Tiled output columns</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code></p></td>
+<td><p>Batch size for current tile</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="visual-explanation">
+<h2>Visual Explanation<a class="headerlink" href="#visual-explanation" title="Link to this heading"></a></h2>
+<section id="gemm-tiling-strategy">
+<h3>GEMM Tiling Strategy<a class="headerlink" href="#gemm-tiling-strategy" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Matrix A [M, N]              Matrix B [N, O]
+┌─────────────────┐          ┌─────────────────────┐
+│  A_tile_0       │          │                     │
+│  [M/2, N]       │          │  B_tile_0  B_tile_1 │
+├─────────────────┤    @     │  [N, O/2]  [N, O/2] │
+│  A_tile_1       │          │                     │
+│  [M/2, N]       │          └─────────────────────┘
+└─────────────────┘
+         │                            │
+         └────────────┬───────────────┘
+                      ▼
+              Output C [M, O]
+              ┌─────────────────────┐
+              │ C_00    │    C_01   │
+              │ [M/2,   │  [M/2,    │
+              │  O/2]   │   O/2]    │
+              ├─────────┼───────────┤
+              │ C_10    │    C_11   │
+              │ [M/2,   │  [M/2,    │
+              │  O/2]   │   O/2]    │
+              └─────────────────────┘
+
+Note: N dimension is NOT tiled (full inner products)
+</pre></div>
+</div>
+</section>
+<section id="memory-layout-with-transposition">
+<h3>Memory Layout with Transposition<a class="headerlink" href="#memory-layout-with-transposition" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>transA = 0, transB = 0 (default):
+A: [M, N] row-major
+B: [N, O] row-major
+
+transA = 1:
+A: [N, M] row-major → logically [M, N]
+
+transB = 1:
+B: [O, N] row-major → logically [N, O]
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="example-1-standard-gemm">
+<h3>Example 1: Standard GEMM<a class="headerlink" href="#example-1-standard-gemm" title="Link to this heading"></a></h3>
+<p><strong>Configuration:</strong></p>
+<ul class="simple">
+<li><p>A: <code class="docutils literal notranslate"><span class="pre">[64,</span> <span class="pre">128]</span></code> (M=64, N=128)</p></li>
+<li><p>B: <code class="docutils literal notranslate"><span class="pre">[128,</span> <span class="pre">256]</span></code> (N=128, O=256)</p></li>
+<li><p>Output: <code class="docutils literal notranslate"><span class="pre">[64,</span> <span class="pre">256]</span></code></p></li>
+<li><p>L1 Memory: 64KB</p></li>
+</ul>
+<p><strong>Constraints Applied:</strong></p>
+<ul class="simple">
+<li><p>N = 128 (full, not tiled)</p></li>
+<li><p>O % 16 == 0 (256 satisfies)</p></li>
+</ul>
+<p><strong>Resulting Tiles:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tile</p></th>
+<th class="head"><p>Output</p></th>
+<th class="head"><p>A Tile</p></th>
+<th class="head"><p>B Tile</p></th>
+<th class="head"><p>Mul/Add</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code> &#64; <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code> &#64; <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code> &#64; <code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code> &#64; <code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128,</span> <span class="pre">128]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[128]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="example-2-batched-gemm">
+<h3>Example 2: Batched GEMM<a class="headerlink" href="#example-2-batched-gemm" title="Link to this heading"></a></h3>
+<p><strong>Configuration:</strong></p>
+<ul class="simple">
+<li><p>A: <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">32,</span> <span class="pre">64]</span></code> (batch=4, M=32, N=64)</p></li>
+<li><p>B: <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">64,</span> <span class="pre">128]</span></code> (batch=4, N=64, O=128)</p></li>
+<li><p>Output: <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">32,</span> <span class="pre">128]</span></code></p></li>
+</ul>
+<p><strong>Tiling:</strong> Only last batch dimension and M/O can be tiled. N=64 is kept full.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="known-limitations">
+<h3>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>No inner dimension tiling:</strong> The N dimension cannot be tiled to avoid partial sums, which would require additional accumulation logic.</p></li>
+<li><p><strong>Batch dimension restriction:</strong> Only the last batch dimension can be tiled when there are multiple batch dimensions.</p></li>
+<li><p><strong>Transposition overhead:</strong> Transposed matrices may have suboptimal memory access patterns.</p></li>
+</ol>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Output column alignment:</strong> Keep O divisible by 16 for optimal SIMD performance.</p></li>
+<li><p><strong>Memory reuse:</strong> Larger M tiles improve A matrix reuse; larger O tiles improve B matrix reuse.</p></li>
+<li><p><strong>Compute intensity:</strong> GEMM has O(M<em>N</em>O) compute and O(M<em>N + N</em>O + M*O) memory traffic. Larger tiles improve compute/memory ratio.</p></li>
+</ol>
+</section>
+<section id="differences-gemmtileconstraint-vs-floatgemmtileconstraint">
+<h3>Differences: GEMMTileConstraint vs FloatGEMMTileConstraint<a class="headerlink" href="#differences-gemmtileconstraint-vs-floatgemmtileconstraint" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Aspect</p></th>
+<th class="head"><p>GEMMTileConstraint</p></th>
+<th class="head"><p>FloatGEMMTileConstraint</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Data types</p></td>
+<td><p>Int8/Int32</p></td>
+<td><p>Float32</p></td>
+</tr>
+<tr class="row-odd"><td><p>Requantization</p></td>
+<td><p>Yes (mul, add)</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>Bias shape</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[O]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[M,</span> <span class="pre">O]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Use case</p></td>
+<td><p>Quantized inference</p></td>
+<td><p>FP training/inference</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/PULPOpen/TileConstraints/GEMMTileConstraint.py</span></code></p></li>
+<li><p>Templates: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/PULPOpen/Templates/GEMMTemplate.py</span></code></p></li>
+<li><p>Tiler configuration: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/PULPOpen/Tiler.py</span></code> (lines 55-59)</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

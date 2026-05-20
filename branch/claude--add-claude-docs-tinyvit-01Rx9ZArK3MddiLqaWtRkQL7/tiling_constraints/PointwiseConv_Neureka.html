@@ -1,0 +1,657 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pointwise Convolution Tiling Constraints - Neureka &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pointwise Convolution Tiling Constraints - Neureka</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/PointwiseConv_Neureka.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="pointwise-convolution-tiling-constraints-neureka">
+<h1>Pointwise Convolution Tiling Constraints - Neureka<a class="headerlink" href="#pointwise-convolution-tiling-constraints-neureka" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Neureka/TileConstraints/NeurekaPointwiseConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">NeurekaPWConv2DTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>This constraint class defines tiling rules for 1x1 Pointwise Convolution operations on the Neureka accelerator. Pointwise convolutions are used for channel mixing without spatial filtering. The constraint handles the specific hardware subtiling requirements of the Neureka accelerator, which processes data in 6x6 spatial and 32-channel output blocks.</p>
+</section>
+<section id="supported-data-types">
+<h3>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input Type</p></th>
+<th class="head"><p>Weight Type</p></th>
+<th class="head"><p>Output Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int32_t</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Extends:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+<li><p><strong>Requantized variant:</strong> <code class="docutils literal notranslate"><span class="pre">NeurekaRQSPWConv2DTileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">H,</span> <span class="pre">W,</span> <span class="pre">C_in]</span></code></p></td>
+<td><p>NHWC</p></td>
+<td><p>Input activation tensor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">weight</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[C_out,</span> <span class="pre">C_in_major,</span> <span class="pre">bandwidth]</span></code></p></td>
+<td><p>Neureka format</p></td>
+<td><p>Weight tensor in Neureka layout</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">H,</span> <span class="pre">W,</span> <span class="pre">C_out]</span></code></p></td>
+<td><p>NHWC</p></td>
+<td><p>Output activation tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of input buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">weight</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of weight buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">strides</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">List[int]</span></code></p></td>
+<td><p>Convolution strides <code class="docutils literal notranslate"><span class="pre">[stride_h,</span> <span class="pre">stride_w]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pads</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">List[int]</span></code></p></td>
+<td><p>Padding <code class="docutils literal notranslate"><span class="pre">[pad_top,</span> <span class="pre">pad_left,</span> <span class="pre">pad_bottom,</span> <span class="pre">pad_right]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_out_x</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Full output height</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_out_y</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Full output width</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ch_im_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Full output channels</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ch_im_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Full input channels</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">input_bits</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Input data bitwidth</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">output_bits</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Output data bitwidth</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>Geometrical constraints define the mathematical relationships between tensor dimensions for valid pointwise convolution.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Dimension Index</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputBatchVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Batch size</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">inputHeightVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Input height</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inputWidthVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Input width</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">weightOutChannelVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">weight</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Weight output channels</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">outputBatchVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Output batch size</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputHeightVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Output height</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">outputWidthVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Output width</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">outputChannelVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>3</p></td>
+<td><p>Output channels</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="batch-dimension-constraint">
+<h4>Batch Dimension Constraint<a class="headerlink" href="#batch-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputBatchVar</span> <span class="o">==</span> <span class="n">inputBatchVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Batch dimension preserved through pointwise convolution.</p>
+</section>
+<hr class="docutils" />
+<section id="spatial-dimension-constraints">
+<h4>Spatial Dimension Constraints<a class="headerlink" href="#spatial-dimension-constraints" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputHeightVar</span> <span class="o">==</span> <span class="n">inputHeightVar</span>
+<span class="n">outputWidthVar</span> <span class="o">==</span> <span class="n">inputWidthVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> For 1x1 pointwise convolution, spatial dimensions are preserved (same input and output height/width).</p>
+</section>
+<hr class="docutils" />
+<section id="weight-output-channel-constraint">
+<h4>Weight-Output Channel Constraint<a class="headerlink" href="#weight-output-channel-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">WeightMemory_SRAM</span><span class="p">:</span>
+    <span class="n">weightOutChannelVar</span> <span class="o">==</span> <span class="n">weightOutChannelVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">weightOutChannelVar</span> <span class="o">==</span> <span class="n">outputChannelVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> If weights are stored in dedicated SRAM, the full weight tensor is used. Otherwise, weights are tiled along with output channels.</p>
+</section>
+<hr class="docutils" />
+<section id="minimum-spatial-dimension-constraints">
+<h4>Minimum Spatial Dimension Constraints<a class="headerlink" href="#minimum-spatial-dimension-constraints" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputHeightVar</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+<span class="n">inputWidthVar</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Minimum tile size requirement - at least 1x1 spatial dimensions.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p>Policy constraints define optimization hints and hardware-specific restrictions for the Neureka accelerator.</p>
+<section id="id1">
+<h3>Constraints<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="full-input-channel-constraint">
+<h4>Full Input Channel Constraint<a class="headerlink" href="#full-input-channel-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputChannelVar</span> <span class="o">==</span> <span class="n">inputChannelVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+<span class="n">weightInChannelMajorVar</span> <span class="o">==</span> <span class="n">weightInChannelMajorVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+<span class="n">weightBandwidthVar</span> <span class="o">==</span> <span class="n">weightBandwidthVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> Input channels cannot be tiled for convolution operations. The complete channel reduction must occur within a single tile to avoid partial results.</p>
+<p><strong>Priority:</strong> Hard constraint (must be satisfied)</p>
+</section>
+<hr class="docutils" />
+<section id="stride-alignment-constraints">
+<h4>Stride Alignment Constraints<a class="headerlink" href="#stride-alignment-constraints" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">inputHeightVar</span> <span class="o">%</span> <span class="n">strides</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="p">(</span><span class="n">inputWidthVar</span> <span class="o">%</span> <span class="n">strides</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> Input tile dimensions must be aligned with stride for correct output computation.</p>
+<p><strong>Priority:</strong> Hard constraint</p>
+</section>
+<hr class="docutils" />
+<section id="neureka-output-height-subtiling-constraint">
+<h4>Neureka Output Height Subtiling Constraint<a class="headerlink" href="#neureka-output-height-subtiling-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">dim_im_out_x</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+    <span class="n">outputHeightVar</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">outputHeightVar</span> <span class="o">==</span> <span class="n">outputHeightVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> The Neureka accelerator processes output in 6x6 spatial blocks. When output height exceeds 6, keeping tiles divisible by 6 aligns with hardware subtiling and maximizes utilization.</p>
+<p><strong>Priority:</strong> Performance hint (priority = 3)</p>
+</section>
+<hr class="docutils" />
+<section id="neureka-output-width-subtiling-constraint">
+<h4>Neureka Output Width Subtiling Constraint<a class="headerlink" href="#neureka-output-width-subtiling-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">dim_im_out_y</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+    <span class="n">outputWidthVar</span> <span class="o">%</span> <span class="mi">6</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">outputWidthVar</span> <span class="o">==</span> <span class="n">outputWidthVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> Same as height - align with 6x6 hardware subtiling for width dimension.</p>
+<p><strong>Priority:</strong> Performance hint (priority = 2)</p>
+</section>
+<hr class="docutils" />
+<section id="neureka-output-channel-subtiling-constraint">
+<h4>Neureka Output Channel Subtiling Constraint<a class="headerlink" href="#neureka-output-channel-subtiling-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">ch_im_out</span> <span class="o">&gt;</span> <span class="mi">32</span><span class="p">:</span>
+    <span class="n">outputChannelVar</span> <span class="o">%</span> <span class="mi">32</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">outputChannelVar</span> <span class="o">==</span> <span class="n">outputChannelVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> The Neureka accelerator processes 32 output channels at a time. Keeping output channels divisible by 32 ensures efficient hardware utilization.</p>
+<p><strong>Priority:</strong> Performance hint (priority = 1)</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="input-cube-computation">
+<h3>Input Cube Computation<a class="headerlink" href="#input-cube-computation" title="Link to this heading"></a></h3>
+<p>Input cubes are computed using <code class="docutils literal notranslate"><span class="pre">Conv2DTileConstraint.computeInputCube()</span></code> which handles padding:</p>
+<p><strong>Algorithm:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">each</span> <span class="n">output</span> <span class="n">tile</span> <span class="n">cube</span><span class="p">:</span>
+    <span class="p">(</span><span class="n">BatchOffset</span><span class="p">,</span> <span class="n">HOffset</span><span class="p">,</span> <span class="n">WOffset</span><span class="p">,</span> <span class="n">COffset</span><span class="p">)</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">offset</span>
+    <span class="p">(</span><span class="n">BatchSize</span><span class="p">,</span> <span class="n">HSize</span><span class="p">,</span> <span class="n">WSize</span><span class="p">,</span> <span class="n">CSize</span><span class="p">)</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">dims</span>
+
+    <span class="c1"># Compute input cube with padding handling</span>
+    <span class="n">InCube</span><span class="p">,</span> <span class="p">(</span><span class="n">padding_left</span><span class="p">,</span> <span class="n">padding_right</span><span class="p">,</span> <span class="n">padding_top</span><span class="p">,</span> <span class="n">padding_bottom</span><span class="p">)</span> <span class="o">=</span> \
+        <span class="n">Conv2DTileConstraint</span><span class="o">.</span><span class="n">computeInputCube</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">weightH</span><span class="p">,</span> <span class="n">weightW</span><span class="p">),</span>  <span class="c1"># 1x1 for pointwise</span>
+            <span class="n">pads</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="n">weightC</span><span class="p">,</span> <span class="n">cube</span><span class="p">,</span> <span class="n">outputBuffer</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_in&quot;</span><span class="p">:</span> <span class="n">InCube</span><span class="p">},</span>
+    <span class="c1"># weight is added if not in WeightMemory_SRAM</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">outCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="weight-memory-handling">
+<h3>Weight Memory Handling<a class="headerlink" href="#weight-memory-handling" title="Link to this heading"></a></h3>
+<p>If weights are in <code class="docutils literal notranslate"><span class="pre">WeightMemory_SRAM</span></code>:</p>
+<ul class="simple">
+<li><p>Weights are accessed via offset calculation (<code class="docutils literal notranslate"><span class="pre">weight_addr_offset</span></code>)</p></li>
+<li><p>No weight tiling needed</p></li>
+</ul>
+<p>Otherwise:</p>
+<ul class="simple">
+<li><p>Weights are included in <code class="docutils literal notranslate"><span class="pre">inputLoadSchedule</span></code></p></li>
+<li><p>Weight cube computed based on output channel offset</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<p>Variables that are replaced with tile-specific values during code generation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">padding_y_top</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t*</span></code></p></td>
+<td><p>Top padding for tile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">padding_y_bottom</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t*</span></code></p></td>
+<td><p>Bottom padding for tile</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">padding_x_left</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t*</span></code></p></td>
+<td><p>Left padding for tile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">padding_x_right</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8_t*</span></code></p></td>
+<td><p>Right padding for tile</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_in_x_stride</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Input X stride in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_in_y_stride</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Input Y stride in bytes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_out_x_stride</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Output X stride in bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dim_im_out_y_stride</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Output Y stride in bytes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">input_addr_offset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Input address offset for padding</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nKo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Number of output channel iterations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nKi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Number of input channel iterations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nHo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Number of output height iterations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nWo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Number of output width iterations</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bKo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Output channel block size</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bKi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input channel block size</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bHo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Output height block size</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bWo</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Output width block size</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bHi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input height block size</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bWi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint16_t*</span></code></p></td>
+<td><p>Input width block size</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">weight_addr_offset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Weight address offset (if WeightMemory_SRAM)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="known-limitations">
+<h3>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>No input channel tiling:</strong> Full input channels required for convolution reduction.</p></li>
+<li><p><strong>Hardware subtiling alignment:</strong> For optimal performance, output tiles should align with Neureka’s 6x6x32 subtiling.</p></li>
+<li><p><strong>Weight memory modes:</strong> Different handling based on whether weights are in dedicated SRAM or tiled memory.</p></li>
+</ol>
+</section>
+<section id="platform-specific-notes">
+<h3>Platform-Specific Notes<a class="headerlink" href="#platform-specific-notes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Neureka subtiling:</strong> The accelerator internally processes data in 6x6 spatial blocks and 32 output channel groups.</p></li>
+<li><p><strong>Stride computation:</strong> <code class="docutils literal notranslate"><span class="pre">ioStridesFromDimensions()</span></code> computes byte strides based on bitwidth.</p></li>
+<li><p><strong>Counter computation:</strong> <code class="docutils literal notranslate"><span class="pre">Neureka2DPWConvTemplate.getCounters()</span></code> computes hardware iteration counters.</p></li>
+</ul>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Output height/width divisible by 6</strong> for optimal Neureka spatial subtiling</p></li>
+<li><p><strong>Output channels divisible by 32</strong> for optimal Neureka channel subtiling</p></li>
+<li><p><strong>Priority order:</strong> Channel alignment (1) &gt; Width alignment (2) &gt; Height alignment (3)</p></li>
+<li><p><strong>WeightMemory_SRAM:</strong> When available, eliminates weight transfer overhead</p></li>
+</ol>
+</section>
+<section id="requantization-support">
+<h3>Requantization Support<a class="headerlink" href="#requantization-support" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">NeurekaRQSPWConv2DTileConstraint</span></code> class extends this with requantization support:</p>
+<ul class="simple">
+<li><p>Adds <code class="docutils literal notranslate"><span class="pre">mul</span></code> and <code class="docutils literal notranslate"><span class="pre">add</span></code> tensors to geometrical constraints</p></li>
+<li><p>Includes requantization parameters in the tiling schedule</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Neureka/TileConstraints/NeurekaPointwiseConstraint.py</span></code></p></li>
+<li><p>Related templates: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Neureka/Templates/ConvTemplate.py</span></code></p></li>
+<li><p>Helper functions: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Neureka/TileConstraints/RequantHelpers.py</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

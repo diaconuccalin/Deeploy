@@ -1,0 +1,32 @@
+.. SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
+..
+.. SPDX-License-Identifier: Apache-2.0
+
+Deeploy.TilingExtension.TileConstraintDebugger.TileConstraintDebugger
+=====================================================================
+
+.. currentmodule:: Deeploy.TilingExtension.TileConstraintDebugger
+
+.. autoclass:: TileConstraintDebugger
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   
+   .. rubric:: Methods
+   .. automethod:: __init__
+
+   .. autosummary::
+   
+      ~TileConstraintDebugger.__init__
+      ~TileConstraintDebugger.analyze_constraint_model
+      ~TileConstraintDebugger.compare_tiling_solutions
+      ~TileConstraintDebugger.explain_constraint_failure
+      ~TileConstraintDebugger.visualize_tiling_solution
+   
+   
+
+   
+   
+   

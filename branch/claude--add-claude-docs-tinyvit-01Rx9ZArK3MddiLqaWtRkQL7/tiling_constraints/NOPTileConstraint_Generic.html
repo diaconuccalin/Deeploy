@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOP Tiling Constraints - Generic &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">NOP Tiling Constraints - Generic</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/NOPTileConstraint_Generic.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="nop-tiling-constraints-generic">
+<h1>NOP Tiling Constraints - Generic<a class="headerlink" href="#nop-tiling-constraints-generic" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/NOPTileConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#buffer-management"><span class="xref myst">Buffer Management</span></a></p></li>
+<li><p><a class="reference internal" href="#examples"><span class="xref myst">Examples</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code> (No-Operation Tile Constraint) is a minimal constraint class used for operators that pass through data without transformation or for placeholder operations. It sets up dimension variables without imposing strict equality constraints between input and output, allowing the tiler maximum flexibility. Additionally, it manages buffer deployment by marking unused auxiliary tensors as non-deployable.</p>
+</section>
+<section id="supported-operations">
+<h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Identity/pass-through operations</p></li>
+<li><p>Reshape operations (when shapes are compatible)</p></li>
+<li><p>View operations</p></li>
+<li><p>Operators with auxiliary buffers that don’t need deployment</p></li>
+</ul>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Inherits from:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[D_0,</span> <span class="pre">D_1,</span> <span class="pre">...,</span> <span class="pre">D_n]</span></code></p></td>
+<td><p>Primary input tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[E_0,</span> <span class="pre">E_1,</span> <span class="pre">...,</span> <span class="pre">E_m]</span></code></p></td>
+<td><p>Primary output tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="auxiliary-tensors">
+<h3>Auxiliary Tensors<a class="headerlink" href="#auxiliary-tensors" title="Link to this heading"></a></h3>
+<p>Any additional tensors in <code class="docutils literal notranslate"><span class="pre">parseDict</span></code> that are registered in the context (either global or local) are identified and marked as non-deployable if they are not the primary input or output.</p>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of input buffer in context</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer in context</p></td>
+</tr>
+<tr class="row-even"><td><p>(other keys)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Potential auxiliary buffer names</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code> imposes minimal geometrical constraints, providing bounds rather than equalities.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<p>For each buffer (input and output), dimension variables are created:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dimVar[i]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code> or <code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>Dimension i of the tensor</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="upper-bound-constraint">
+<h4>Upper Bound Constraint<a class="headerlink" href="#upper-bound-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="n">each</span> <span class="n">buffer</span> <span class="ow">in</span> <span class="p">[</span><span class="n">data_in</span><span class="p">,</span> <span class="n">data_out</span><span class="p">]:</span>
+    <span class="n">For</span> <span class="nb">all</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">dimVar</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> Each dimension variable is constrained to be less than or equal to the full tensor dimension. This allows tiling (smaller dimensions) but prevents exceeding the actual tensor size.</p>
+<p><strong>Note:</strong> Unlike other tile constraints, there are no explicit equality constraints between input and output dimensions. This makes <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code> suitable for operations where input and output may have different shapes.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p><strong>None.</strong> The <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code> does not impose any policy constraints. The tiler has maximum flexibility in choosing tile sizes.</p>
+</section>
+<hr class="docutils" />
+<section id="buffer-management">
+<h2>Buffer Management<a class="headerlink" href="#buffer-management" title="Link to this heading"></a></h2>
+<section id="auxiliary-buffer-handling">
+<h3>Auxiliary Buffer Handling<a class="headerlink" href="#auxiliary-buffer-handling" title="Link to this heading"></a></h3>
+<p>The constraint identifies all string values in <code class="docutils literal notranslate"><span class="pre">parseDict</span></code> that reference buffers in the network context (either global or local). Buffers that are not the primary input or output are marked as non-deployable:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parseDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ctxt</span><span class="o">.</span><span class="n">is_global</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ctxt</span><span class="o">.</span><span class="n">is_local</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+        <span class="n">pointer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">bufferName</span> <span class="ow">in</span> <span class="n">pointer</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">bufferName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">inputBufferName</span><span class="p">,</span> <span class="n">outputBufferName</span><span class="p">]:</span>
+        <span class="n">ctxt</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">bufferName</span><span class="p">)</span><span class="o">.</span><span class="n">_deploy</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p><strong>Purpose:</strong> This prevents auxiliary buffers (like shape tensors or metadata) from being allocated in the generated code when they are only used for compile-time information.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">NOPTileConstraint</span></code> does not override <code class="docutils literal notranslate"><span class="pre">serializeTilingSolution</span></code>, so it uses the default implementation from the parent <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code> class. This means:</p>
+<ul class="simple">
+<li><p>Input and output cubes are typically treated as having the same structure</p></li>
+<li><p>Standard base address extraction is performed</p></li>
+<li><p>No custom replacements are generated</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="example-1-identity-operation">
+<h3>Example 1: Identity Operation<a class="headerlink" href="#example-1-identity-operation" title="Link to this heading"></a></h3>
+<p><strong>Input Parameters:</strong></p>
+<ul class="simple">
+<li><p>Input shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+<li><p>Output shape: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">32,</span> <span class="pre">32,</span> <span class="pre">64]</span></code> (same as input)</p></li>
+</ul>
+<p><strong>Constraints Generated:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputDimVar</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+<span class="n">inputDimVar</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">32</span>
+<span class="n">inputDimVar</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">32</span>
+<span class="n">inputDimVar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">64</span>
+
+<span class="n">outputDimVar</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+<span class="n">outputDimVar</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">32</span>
+<span class="n">outputDimVar</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">32</span>
+<span class="n">outputDimVar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">64</span>
+</pre></div>
+</div>
+<p><strong>Tiler Freedom:</strong> The tiler can choose any tile size up to the full tensor dimensions.</p>
+</section>
+<hr class="docutils" />
+<section id="example-2-reshape-with-auxiliary-shape-tensor">
+<h3>Example 2: Reshape with Auxiliary Shape Tensor<a class="headerlink" href="#example-2-reshape-with-auxiliary-shape-tensor" title="Link to this heading"></a></h3>
+<p><strong>Parse Dictionary:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;data_in&#39;</span><span class="p">:</span> <span class="s1">&#39;input_tensor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;data_out&#39;</span><span class="p">:</span> <span class="s1">&#39;output_tensor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="s1">&#39;shape_tensor&#39;</span>  <span class="c1"># Auxiliary tensor with new shape</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Buffer Management:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input_tensor</span></code>: Deployed (primary input)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_tensor</span></code>: Deployed (primary output)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shape_tensor</span></code>: Marked as <code class="docutils literal notranslate"><span class="pre">_deploy</span> <span class="pre">=</span> <span class="pre">False</span></code> (auxiliary, not needed at runtime)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="example-3-pass-through-with-multiple-auxiliary-buffers">
+<h3>Example 3: Pass-through with Multiple Auxiliary Buffers<a class="headerlink" href="#example-3-pass-through-with-multiple-auxiliary-buffers" title="Link to this heading"></a></h3>
+<p><strong>Parse Dictionary:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;data_in&#39;</span><span class="p">:</span> <span class="s1">&#39;features&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;data_out&#39;</span><span class="p">:</span> <span class="s1">&#39;processed&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="s1">&#39;scale_buffer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="s1">&#39;config_buffer&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Buffer Management:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">features</span></code>: Deployed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">processed</span></code>: Deployed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scale_buffer</span></code>: Marked as <code class="docutils literal notranslate"><span class="pre">_deploy</span> <span class="pre">=</span> <span class="pre">False</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config_buffer</span></code>: Marked as <code class="docutils literal notranslate"><span class="pre">_deploy</span> <span class="pre">=</span> <span class="pre">False</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="key-characteristics">
+<h3>Key Characteristics<a class="headerlink" href="#key-characteristics" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Minimal constraints:</strong> Only upper bounds are enforced, giving the tiler maximum flexibility.</p></li>
+<li><p><strong>No shape relationship:</strong> Input and output shapes are not required to match. This is intentional for operations like Reshape.</p></li>
+<li><p><strong>Auxiliary buffer management:</strong> Automatically identifies and disables deployment for auxiliary buffers.</p></li>
+<li><p><strong>No custom serialization:</strong> Uses default tiling schedule generation from parent class.</p></li>
+</ol>
+</section>
+<section id="use-cases">
+<h3>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Identity operations:</strong> Pass-through layers that don’t modify data.</p></li>
+<li><p><strong>Reshape operations:</strong> When the total element count is preserved but shape changes.</p></li>
+<li><p><strong>Operators with metadata:</strong> Operations that have auxiliary tensors (shape, indices, etc.) that are only needed at compile time.</p></li>
+<li><p><strong>Placeholder constraints:</strong> When a custom constraint is not yet implemented for an operator.</p></li>
+</ol>
+</section>
+<section id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>No input-output relationship:</strong> Since no equality constraints link input and output, the tiler may generate invalid tile configurations for operations that actually require shape matching.</p></li>
+<li><p><strong>Limited use cases:</strong> This constraint is typically a fallback or for very specific operators. Most operators need explicit shape relationships.</p></li>
+<li><p><strong>No replacements generated:</strong> The default serialization does not provide operator-specific replacements, which may limit code generation flexibility.</p></li>
+</ol>
+</section>
+<section id="when-to-use">
+<h3>When to Use<a class="headerlink" href="#when-to-use" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Operations that truly don’t require shape constraints (rare)</p></li>
+<li><p>Temporary placeholder while developing a proper constraint</p></li>
+<li><p>Operations where auxiliary buffers need to be hidden from deployment</p></li>
+</ul>
+</section>
+<section id="when-not-to-use">
+<h3>When NOT to Use<a class="headerlink" href="#when-not-to-use" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Element-wise operations (use <code class="docutils literal notranslate"><span class="pre">UnaryTileConstraint</span></code> or <code class="docutils literal notranslate"><span class="pre">BOPTileConstraint</span></code>)</p></li>
+<li><p>Operations with specific shape relationships (create custom constraint)</p></li>
+<li><p>Operations that need tile-specific replacements</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/TileConstraints/NOPTileConstraint.py</span></code></p></li>
+<li><p>Parent class: <code class="docutils literal notranslate"><span class="pre">Deeploy/TilingExtension/TileConstraint.py</span></code></p></li>
+<li><p>Related: <code class="docutils literal notranslate"><span class="pre">UntiledTileConstraint</span></code> for operations that should not be tiled at all</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

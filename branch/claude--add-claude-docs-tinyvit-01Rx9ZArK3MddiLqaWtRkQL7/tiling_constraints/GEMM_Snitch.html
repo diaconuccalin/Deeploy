@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="../_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="../_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEMM Tiling Constraints - Snitch &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GEMM Tiling Constraints - Snitch</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tiling_constraints/GEMM_Snitch.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="gemm-tiling-constraints-snitch">
+<h1>GEMM Tiling Constraints - Snitch<a class="headerlink" href="#gemm-tiling-constraints-snitch" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>File:</strong> <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/TileConstraints/GemmTileConstraint.py</span></code>
+<strong>Class:</strong> <code class="docutils literal notranslate"><span class="pre">GemmTileConstraint</span></code>
+<strong>Last Updated:</strong> 2025-11-18</p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#overview"><span class="xref myst">Overview</span></a></p></li>
+<li><p><a class="reference internal" href="#tensor-definitions"><span class="xref myst">Tensor Definitions</span></a></p></li>
+<li><p><a class="reference internal" href="#geometrical-constraints"><span class="xref myst">Geometrical Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#policy-constraints"><span class="xref myst">Policy Constraints</span></a></p></li>
+<li><p><a class="reference internal" href="#tiling-schedule"><span class="xref myst">Tiling Schedule</span></a></p></li>
+<li><p><a class="reference internal" href="#replacements"><span class="xref myst">Replacements</span></a></p></li>
+<li><p><a class="reference internal" href="#notes-and-limitations"><span class="xref myst">Notes and Limitations</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>This constraint class defines tiling rules for General Matrix Multiplication (GEMM) operations on the Snitch platform. The GEMM operation computes <code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">A</span> <span class="pre">*</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">C</span></code> where A, B, and C are matrices. The constraint supports both transposed and non-transposed inputs and handles optional bias addition.</p>
+</section>
+<section id="supported-data-types">
+<h3>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input A Type</p></th>
+<th class="head"><p>Input B Type</p></th>
+<th class="head"><p>Output Y Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float32_t</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parent-class">
+<h3>Parent Class<a class="headerlink" href="#parent-class" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Extends:</strong> <code class="docutils literal notranslate"><span class="pre">TileConstraint</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tensor-definitions">
+<h2>Tensor Definitions<a class="headerlink" href="#tensor-definitions" title="Link to this heading"></a></h2>
+<section id="input-tensors">
+<h3>Input Tensors<a class="headerlink" href="#input-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">M,</span> <span class="pre">N]</span></code> or <code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">N,</span> <span class="pre">M]</span></code></p></td>
+<td><p>Row-major (depends on transA)</p></td>
+<td><p>First input matrix</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">N,</span> <span class="pre">O]</span></code> or <code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">O,</span> <span class="pre">N]</span></code></p></td>
+<td><p>Row-major (depends on transB)</p></td>
+<td><p>Second input matrix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">M,</span> <span class="pre">O]</span></code></p></td>
+<td><p>Row-major (optional)</p></td>
+<td><p>Bias matrix</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-tensors">
+<h3>Output Tensors<a class="headerlink" href="#output-tensors" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Layout</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[...,</span> <span class="pre">M,</span> <span class="pre">O]</span></code></p></td>
+<td><p>Row-major</p></td>
+<td><p>Output matrix (Y = A * B + C)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parse-dictionary-keys">
+<h3>Parse Dictionary Keys<a class="headerlink" href="#parse-dictionary-keys" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of first input matrix buffer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of second input matrix buffer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of bias matrix buffer (optional)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Name of output buffer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Whether to transpose A (0=no, 1=yes)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">transB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Whether to transpose B (0=no, 1=yes)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">M</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Output height dimension</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Inner/reduction dimension</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">O</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>Output width dimension</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="geometrical-constraints">
+<h2>Geometrical Constraints<a class="headerlink" href="#geometrical-constraints" title="Link to this heading"></a></h2>
+<p>Geometrical constraints define the mathematical relationships between tensor dimensions that must hold for correct matrix multiplication.</p>
+<section id="dimension-variables">
+<h3>Dimension Variables<a class="headerlink" href="#dimension-variables" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Tensor</p></th>
+<th class="head"><p>Dimension Index</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AHeightDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p>dimCount-2 or dimCount-1</p></td>
+<td><p>Height of A (M or N depending on transA)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AWidthDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td><p>dimCount-1 or dimCount-2</p></td>
+<td><p>Width of A (N or M depending on transA)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BHeightDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p>dimCount-2 or dimCount-1</p></td>
+<td><p>Height of B (N or O depending on transB)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BWidthDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p>dimCount-1 or dimCount-2</p></td>
+<td><p>Width of B (O or N depending on transB)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">YHeightDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>dimCount-2</p></td>
+<td><p>Output height (M)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">YWidthDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
+<td><p>dimCount-1</p></td>
+<td><p>Output width (O)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CHeightDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p>dimCount-2</p></td>
+<td><p>Bias height (M) (if C exists)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CWidthDimVar</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td><p>dimCount-1</p></td>
+<td><p>Bias width (O) (if C exists)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading"></a></h3>
+<section id="output-height-constraint">
+<h4>Output Height Constraint<a class="headerlink" href="#output-height-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">YHeightDimVar</span> <span class="o">==</span> <span class="n">AHeightDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> The output height (M) must equal the height dimension of matrix A (considering transposition).</p>
+</section>
+<hr class="docutils" />
+<section id="output-width-constraint">
+<h4>Output Width Constraint<a class="headerlink" href="#output-width-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">YWidthDimVar</span> <span class="o">==</span> <span class="n">BWidthDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> The output width (O) must equal the width dimension of matrix B (considering transposition).</p>
+</section>
+<hr class="docutils" />
+<section id="inner-dimension-constraint">
+<h4>Inner Dimension Constraint<a class="headerlink" href="#inner-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AWidthDimVar</span> <span class="o">==</span> <span class="n">BHeightDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> The inner/reduction dimension (N) must match between A’s width and B’s height for valid matrix multiplication.</p>
+</section>
+<hr class="docutils" />
+<section id="bias-dimension-constraints-if-c-exists">
+<h4>Bias Dimension Constraints (if C exists)<a class="headerlink" href="#bias-dimension-constraints-if-c-exists" title="Link to this heading"></a></h4>
+<p><strong>Propositions:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CHeightDimVar</span> <span class="o">==</span> <span class="n">YHeightDimVar</span>
+<span class="n">CWidthDimVar</span> <span class="o">==</span> <span class="n">YWidthDimVar</span>
+</pre></div>
+</div>
+<p><strong>Description:</strong> If a bias matrix C is provided, its dimensions must match the output dimensions exactly.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="policy-constraints">
+<h2>Policy Constraints<a class="headerlink" href="#policy-constraints" title="Link to this heading"></a></h2>
+<p>Policy constraints define optimization hints and platform-specific restrictions for efficient tiling.</p>
+<section id="id1">
+<h3>Constraints<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="full-inner-dimension-constraint">
+<h4>Full Inner Dimension Constraint<a class="headerlink" href="#full-inner-dimension-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AWidthDimVar</span> <span class="o">==</span> <span class="n">AWidthDimVar</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> The inner dimension (N) must not be tiled. This is required because partial reduction along the inner dimension would produce incorrect results without accumulation logic.</p>
+<p><strong>Priority:</strong> Hard constraint (must be satisfied)</p>
+</section>
+<hr class="docutils" />
+<section id="output-height-divisibility-constraint">
+<h4>Output Height Divisibility Constraint<a class="headerlink" href="#output-height-divisibility-constraint" title="Link to this heading"></a></h4>
+<p><strong>Proposition:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">YHeightDimVar</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span>  <span class="p">(</span><span class="n">when</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Rationale:</strong> The output height dimension (M) is parallelized across the 8 cores in the Snitch cluster. Keeping M divisible by 8 ensures balanced workload distribution.</p>
+<p><strong>Priority:</strong> Performance hint (priority = 1)</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tiling-schedule">
+<h2>Tiling Schedule<a class="headerlink" href="#tiling-schedule" title="Link to this heading"></a></h2>
+<section id="input-cube-computation">
+<h3>Input Cube Computation<a class="headerlink" href="#input-cube-computation" title="Link to this heading"></a></h3>
+<p>The input cubes for A and B are computed based on the output tile position, handling transposition:</p>
+<p><strong>Algorithm:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">each</span> <span class="n">output</span> <span class="n">tile</span> <span class="n">YCube</span><span class="p">:</span>
+    <span class="n">MOffset</span><span class="p">,</span> <span class="n">OOffset</span> <span class="o">=</span> <span class="n">YCube</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">MSize</span><span class="p">,</span> <span class="n">OSize</span> <span class="o">=</span> <span class="n">YCube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+
+    <span class="c1"># Handle batch dimension</span>
+    <span class="k">if</span> <span class="mi">3</span><span class="n">D</span> <span class="n">tensor</span><span class="p">:</span>
+        <span class="n">BatchOffset</span> <span class="o">=</span> <span class="n">YCube</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">BatchSize</span> <span class="o">=</span> <span class="n">YCube</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">BatchOffset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">BatchSize</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Inner dimension is always full</span>
+    <span class="n">NOffset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NSize</span> <span class="o">=</span> <span class="n">N</span> <span class="p">(</span><span class="n">full</span><span class="p">)</span>
+
+    <span class="c1"># Compute A cube based on transposition</span>
+    <span class="k">if</span> <span class="n">transA</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ACube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">BatchOffset</span><span class="p">,</span> <span class="n">MOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">BatchSize</span><span class="p">,</span> <span class="n">MSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ACube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">BatchOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">,</span> <span class="n">MOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">BatchSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">,</span> <span class="n">MSize</span><span class="p">))</span>
+
+    <span class="c1"># Compute B cube based on transposition</span>
+    <span class="k">if</span> <span class="n">transB</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">BCube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">BatchOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">,</span> <span class="n">OOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">BatchSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">,</span> <span class="n">OSize</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">BCube</span> <span class="o">=</span> <span class="n">HyperRectangle</span><span class="p">((</span><span class="n">BatchOffset</span><span class="p">,</span> <span class="n">OOffset</span><span class="p">,</span> <span class="n">NOffset</span><span class="p">),</span> <span class="p">(</span><span class="n">BatchSize</span><span class="p">,</span> <span class="n">OSize</span><span class="p">,</span> <span class="n">NSize</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="load-schedule-structure">
+<h3>Load Schedule Structure<a class="headerlink" href="#load-schedule-structure" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">ACube</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">BCube</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">YCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+
+<span class="n">outputLoadSchedule</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;data_out&quot;</span><span class="p">:</span> <span class="n">YCube</span><span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="replacements">
+<h2>Replacements<a class="headerlink" href="#replacements" title="Link to this heading"></a></h2>
+<p>Variables that are replaced with tile-specific values during code generation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">M</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Tiled output height dimension</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">O</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Tiled output width dimension</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint32_t*</span></code></p></td>
+<td><p>Batch size for current tile</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="notes-and-limitations">
+<h2>Notes and Limitations<a class="headerlink" href="#notes-and-limitations" title="Link to this heading"></a></h2>
+<section id="known-limitations">
+<h3>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>No inner dimension tiling:</strong> The reduction dimension (N) cannot be tiled due to accumulation requirements. The entire inner dimension must fit in memory.</p></li>
+<li><p><strong>Batch dimension support:</strong> Only 2D and 3D tensors are supported. The batch dimension is in index 0 for 3D tensors.</p></li>
+<li><p><strong>Bias must match output:</strong> If bias C is provided, it must have the same tiled dimensions as the output.</p></li>
+</ol>
+</section>
+<section id="platform-specific-notes">
+<h3>Platform-Specific Notes<a class="headerlink" href="#platform-specific-notes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Parallelization:</strong> The Snitch cluster has 8 cores. Work is parallelized across the M (output height) dimension.</p></li>
+<li><p><strong>Memory alignment:</strong> For optimal performance, keep M divisible by 8 for balanced core utilization.</p></li>
+</ul>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Maximize M tile size</strong> while respecting memory constraints to improve core utilization</p></li>
+<li><p><strong>Keep M divisible by 8</strong> to balance workload across cores</p></li>
+<li><p><strong>Inner dimension must be full</strong> - ensure N fits entirely in L1 memory</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Source file: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/TileConstraints/GemmTileConstraint.py</span></code></p></li>
+<li><p>Related templates: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/Templates/GemmTemplate.py</span></code></p></li>
+<li><p>Tiler configuration: <code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/Tiler.py</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

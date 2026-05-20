@@ -1,0 +1,900 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="_static/DeeployIconGreen.svg" rel="icon" type="image/svg+xml">
+    <link href="_static/DeeployIconGreen-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="_static/DeeployIconGreen-64x64.png" sizes="64x64" rel="icon" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CI Test Dependency Graphs &mdash; Deeploy 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=6fefd858"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/DeeployBannerGreen-640x-320.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/overview.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Library Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apidocs.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: white" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Deeploy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CI Test Dependency Graphs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/CI_TEST_DEPENDENCIES.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="ci-test-dependency-graphs">
+<h1>CI Test Dependency Graphs<a class="headerlink" href="#ci-test-dependency-graphs" title="Link to this heading"></a></h1>
+<p>This document provides comprehensive dependency mappings between operators, tests, platforms, and components to help identify which tests to run when making changes to the Deeploy codebase.</p>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#operator-to-test-mapping"><span class="xref myst">Operator to Test Mapping</span></a></p></li>
+<li><p><a class="reference internal" href="#platform-to-test-mapping"><span class="xref myst">Platform to Test Mapping</span></a></p></li>
+<li><p><a class="reference internal" href="#component-to-test-mapping"><span class="xref myst">Component to Test Mapping</span></a></p></li>
+<li><p><a class="reference internal" href="#test-category-index"><span class="xref myst">Test Category Index</span></a></p></li>
+<li><p><a class="reference internal" href="#change-impact-analysis-guide"><span class="xref myst">Change Impact Analysis Guide</span></a></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="operator-to-test-mapping">
+<h2>Operator to Test Mapping<a class="headerlink" href="#operator-to-test-mapping" title="Link to this heading"></a></h2>
+<p>When modifying an operator implementation, run all tests that use that operator.</p>
+<section id="core-operators">
+<h3>Core Operators<a class="headerlink" href="#core-operators" title="Link to this heading"></a></h3>
+<section id="add">
+<h4>Add<a class="headerlink" href="#add" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> Adder, MultIO, Attention, TestAdderLarge, TestRQAdd, largeFloatAdd, testFloatAdder, testFloatReshapeWithSkipConnection, testMatMulAdd, testTypeInferenceDifferentTypes, CCT/<em>, ICCT/</em>, microLlama/*, miniMobileNetv2, MLPerf/ImageClassification, Quant, QuantizedLinear, Transformer, WaveFormer, testFloatDemoTinyViT, testRQGEMMwBatch</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled, Neureka</p>
+</section>
+<hr class="docutils" />
+<section id="conv-2d-convolution">
+<h4>Conv (2D Convolution)<a class="headerlink" href="#conv-2d-convolution" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> test1DConvolution, test2DConvolution, test1DDWConvolution, test2DDWConvolution, test2DRequantizedConv, test2DRequantizedStriddedPaddedConv, testFloat2DConvolution, testFloat2DConvolutionBias, testFloat2DConvolutionZeroBias, testFloat2DDWConvolution, testFloat2DDWConvolutionBias, testFloat2DDWConvolutionZeroBias, testRQConv, testRequantizedDWConv, testPointwise, testPointwiseConvBNReLU, testPointwiseUnsignedWeights, simpleCNN, simpleRegression, miniMobileNet, miniMobileNetv2, MobileNetv2, CCT/<em>, ICCT/</em>, MLPerf/*, WaveFormer, Autoencoder1D, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, MemPool, Siracusa, Siracusa-Tiled, Neureka</p>
+<p><strong>TileConstraints:</strong> Conv2DTileConstraint, DWConv2DTileConstraint, RQConv2DTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="matmul">
+<h4>MatMul<a class="headerlink" href="#matmul" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testMatMul, testMatMulAdd, testMatMulBatch, testFloatMatmul, testRQMatMul, Attention, CCT/<em>, ICCT/</em>, microLlama/*, Transformer, WaveFormer, EEGFormer, QuantizedLinear, testFloatDemoTinyViT, testRQGEMMwBatch</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled</p>
+<p><strong>TileConstraints:</strong> MatMulTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="gemm">
+<h4>Gemm<a class="headerlink" href="#gemm" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testGEMM, testFloatGEMM, testFloatGEMMnobias, testFloatGEMMtransB, testRQGEMM, testRQGEMMTransB, testRequantizedLinear, simpleRegression, miniMobileNet, miniMobileNetv2, CCT/<em>, ICCT/</em>, MLPerf/*, WaveFormer, Autoencoder1D, testFloatReshapeWithSkipConnection, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, MemPool, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled, Neureka</p>
+<p><strong>TileConstraints:</strong> GEMMTileConstraint, FloatGEMMTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="maxpool">
+<h4>MaxPool<a class="headerlink" href="#maxpool" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testMaxPool, testFloatMaxPool, simpleCNN, simpleRegression, CCT/<em>, ICCT/</em>, MLPerf/*, Autoencoder1D</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Siracusa, Siracusa-Tiled</p>
+<p><strong>TileConstraints:</strong> MaxPoolTileConstraint, MaxPoolHWTileConstraint, MaxPoolCTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="softmax">
+<h4>Softmax<a class="headerlink" href="#softmax" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatSoftmax, CCT/*, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled</p>
+</section>
+<hr class="docutils" />
+<section id="isoftmax-integer-softmax">
+<h4>iSoftmax (Integer Softmax)<a class="headerlink" href="#isoftmax-integer-softmax" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> iSoftmax, TestiSoftmaxLarge, Attention, Transformer, microLlama/*</p>
+<p><strong>Platforms:</strong> Generic, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled</p>
+<p><strong>TileConstraints:</strong> iSoftmaxTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="layernormalization">
+<h4>LayerNormalization<a class="headerlink" href="#layernormalization" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatLayerNorm, CCT/*, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, Siracusa, Siracusa-Tiled</p>
+<p><strong>TileConstraints:</strong> LayernormTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="relu">
+<h4>Relu<a class="headerlink" href="#relu" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatRelu, CCT/*, Autoencoder1D</p>
+<p><strong>Platforms:</strong> Generic, Siracusa, Siracusa-Tiled</p>
+</section>
+<hr class="docutils" />
+<section id="gelu">
+<h4>Gelu<a class="headerlink" href="#gelu" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatGelu, CCT/*, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="transpose">
+<h4>Transpose<a class="headerlink" href="#transpose" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatTranspose, Attention, CCT/<em>, ICCT/</em>, microLlama/*, Transformer, WaveFormer, EEGFormer, QuantizedLinear, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, Siracusa, Siracusa-Tiled</p>
+<p><strong>TileConstraints:</strong> TransposeTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="reshape">
+<h4>Reshape<a class="headerlink" href="#reshape" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatReshape, testFloatReshapeWithSkipConnection, Attention, CCT/<em>, ICCT/</em>, microLlama/<em>, Transformer, WaveFormer, EEGFormer, MLPerf/</em>, Autoencoder1D, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="concat">
+<h4>Concat<a class="headerlink" href="#concat" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testConcat, testBacktracking, CCT/CCT_2_32_32_128_Opset20, microLlama/*, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Siracusa, Siracusa-Tiled</p>
+<p><strong>TileConstraints:</strong> ConcatTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="reducemean">
+<h4>ReduceMean<a class="headerlink" href="#reducemean" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testReduceMean, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, CortexM, Siracusa, Siracusa-Tiled</p>
+<p><strong>TileConstraints:</strong> ReduceMeanTileConstraint</p>
+</section>
+<hr class="docutils" />
+<section id="reducesum">
+<h4>ReduceSum<a class="headerlink" href="#reducesum" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testReduceSum, testFloatReduceSum</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="pad">
+<h4>Pad<a class="headerlink" href="#pad" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> test1DPad, test2DPad, testFloat2DPadding</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="slice">
+<h4>Slice<a class="headerlink" href="#slice" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testSlice, CCT/CCT_2_32_32_128_Opset20, testFloatDemoTinyViT</p>
+<p><strong>Platforms:</strong> Generic, CortexM, MemPool, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="requantshift">
+<h4>RequantShift<a class="headerlink" href="#requantshift" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> test2DRequantizedConv, test2DRequantizedStriddedPaddedConv, testRequantizedDWConv, testRQConv, testRQMatMul, testRQGEMM, testRQGEMMTransB, testRQGEMMwBatch, TestRQAdd, RQHardswish, testRequantizedLinear, testPointwiseConvBNReLU, testPointwiseUnsignedWeights, trueIntegerDivSandwich, Attention, ICCT/<em>, microLlama/</em>, miniMobileNet, miniMobileNetv2, MobileNetv2, MLPerf/*, simpleRegression, simpleCNN, Transformer, WaveFormer</p>
+<p><strong>Platforms:</strong> Generic, MemPool, Snitch, Siracusa, Siracusa-Tiled, Snitch-Tiled, Neureka</p>
+</section>
+<hr class="docutils" />
+<section id="ihardswish">
+<h4>iHardswish<a class="headerlink" href="#ihardswish" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> Hardswish, RQHardswish, microLlama/*</p>
+<p><strong>Platforms:</strong> Siracusa, Siracusa-Tiled</p>
+</section>
+<hr class="docutils" />
+<section id="irmsnorm">
+<h4>iRMSNorm<a class="headerlink" href="#irmsnorm" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testRMSNorm, microLlama/*</p>
+<p><strong>Platforms:</strong> Siracusa, Siracusa-Tiled</p>
+</section>
+<hr class="docutils" />
+<section id="mul">
+<h4>Mul<a class="headerlink" href="#mul" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatMul, CCT/<em>, microLlama/</em>, WaveFormer, testFloatDemoTinyViT, Dequant</p>
+<p><strong>Platforms:</strong> Generic, Siracusa, Siracusa-Tiled</p>
+</section>
+<hr class="docutils" />
+<section id="div">
+<h4>Div<a class="headerlink" href="#div" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> testFloatDiv, Quant, QuantizedLinear</p>
+<p><strong>Platforms:</strong> Generic, Siracusa</p>
+</section>
+<hr class="docutils" />
+<section id="trueintegerdiv">
+<h4>TrueIntegerDiv<a class="headerlink" href="#trueintegerdiv" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> trueIntegerDivSandwich, microLlama/*</p>
+<p><strong>Platforms:</strong> Siracusa, Siracusa-Tiled</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="special-platform-specific-operators">
+<h3>Special/Platform-Specific Operators<a class="headerlink" href="#special-platform-specific-operators" title="Link to this heading"></a></h3>
+<section id="itamax-itapartialmax">
+<h4>ITAMax / ITAPartialMax<a class="headerlink" href="#itamax-itapartialmax" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> ICCT, ICCT_8, ICCT_ITA, ICCT_ITA_8</p>
+<p><strong>Platforms:</strong> Generic, MemPool</p>
+</section>
+<hr class="docutils" />
+<section id="ilayernorm">
+<h4>iLayerNorm<a class="headerlink" href="#ilayernorm" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> ICCT/<em>, ICCT_ITA/</em></p>
+<p><strong>Platforms:</strong> Generic, MemPool</p>
+</section>
+<hr class="docutils" />
+<section id="igelu">
+<h4>iGELU<a class="headerlink" href="#igelu" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> ICCT/*, WaveFormer</p>
+<p><strong>Platforms:</strong> Generic, MemPool</p>
+</section>
+<hr class="docutils" />
+<section id="integermean">
+<h4>IntegerMean<a class="headerlink" href="#integermean" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> ICCT/*, WaveFormer</p>
+<p><strong>Platforms:</strong> Generic, MemPool</p>
+</section>
+<hr class="docutils" />
+<section id="inonorm">
+<h4>iNoNorm<a class="headerlink" href="#inonorm" title="Link to this heading"></a></h4>
+<p><strong>Tests:</strong> TestiNoNorm</p>
+<p><strong>Platforms:</strong> Snitch, Snitch-Tiled</p>
+<hr class="docutils" />
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="platform-to-test-mapping">
+<h2>Platform to Test Mapping<a class="headerlink" href="#platform-to-test-mapping" title="Link to this heading"></a></h2>
+<section id="generic-host-cpu">
+<h3>Generic (Host CPU)<a class="headerlink" href="#generic-host-cpu" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-generic.yml
+<strong>Runner:</strong> testRunner_generic.py
+<strong>Test Count:</strong> 52</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>Adder, MultIO</p></li>
+<li><p>test1DConvolution, test2DConvolution, test1DDWConvolution, test2DDWConvolution</p></li>
+<li><p>test1DPad, test2DPad</p></li>
+<li><p>testGEMM, testMatMul, testMatMulAdd, testMaxPool</p></li>
+<li><p>testRQConv, testRQMatMul, testReduceSum, testReduceMean, testSlice</p></li>
+<li><p>testRequantizedDWConv, test2DRequantizedConv</p></li>
+<li><p>iSoftmax</p></li>
+<li><p>testFloatAdder, testFloatGEMM</p></li>
+<li><p>testFloat2DConvolution, testFloat2DConvolutionBias, testFloat2DConvolutionZeroBias</p></li>
+<li><p>testFloatLayerNorm, testFloatDiv</p></li>
+<li><p>testFloat2DDWConvolution, testFloat2DDWConvolutionBias, testFloat2DDWConvolutionZeroBias</p></li>
+<li><p>testFloatRelu, testFloatMaxPool, testFloatMatmul</p></li>
+<li><p>testFloatReshapeWithSkipConnection, testFloatSoftmax, testFloatTranspose, testFloatMul</p></li>
+<li><p>Quant, Dequant, QuantizedLinear</p></li>
+</ul>
+<p><strong>Model Tests:</strong></p>
+<ul class="simple">
+<li><p>simpleRegression, WaveFormer, simpleCNN</p></li>
+<li><p>ICCT, ICCT_ITA, ICCT_8, ICCT_ITA_8</p></li>
+<li><p>miniMobileNet, miniMobileNetv2</p></li>
+<li><p>CCT/CCT_1_16_16_8, CCT/CCT_2_32_32_128_Opset20</p></li>
+<li><p>testFloatDemoTinyViT, Autoencoder1D</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="cortexm-arm-cortex-m4">
+<h3>CortexM (ARM Cortex-M4)<a class="headerlink" href="#cortexm-arm-cortex-m4" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-cortexm.yml
+<strong>Runner:</strong> testRunner_cortexm.py
+<strong>Simulator:</strong> QEMU
+<strong>Test Count:</strong> 13</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>Adder, MultIO</p></li>
+<li><p>test1DPad, test2DPad</p></li>
+<li><p>testMatMul, testMatMulAdd, testMaxPool</p></li>
+<li><p>testRQConv, testReduceSum, testReduceMean, testSlice</p></li>
+</ul>
+<p><strong>Model Tests:</strong></p>
+<ul class="simple">
+<li><p>simpleRegression, WaveFormer</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="mempool-multi-core-risc-v">
+<h3>MemPool (Multi-core RISC-V)<a class="headerlink" href="#mempool-multi-core-risc-v" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-mempool.yml
+<strong>Runner:</strong> testRunner_mempool.py
+<strong>Simulator:</strong> Banshee
+<strong>Test Count:</strong> 27</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>Adder, MultIO</p></li>
+<li><p>test1DConvolution, test2DConvolution, test1DDWConvolution, test2DDWConvolution</p></li>
+<li><p>test1DPad, test2DPad</p></li>
+<li><p>testGEMM, testMatMul, testMatMulAdd, testMaxPool</p></li>
+<li><p>testRQConv, testRQGEMM, testRQMatMul</p></li>
+<li><p>testReduceSum, testReduceMean, testSlice</p></li>
+<li><p>testRequantizedDWConv, test2DRequantizedConv</p></li>
+</ul>
+<p><strong>Model Tests:</strong></p>
+<ul class="simple">
+<li><p>simpleRegression, simpleCNN</p></li>
+<li><p>ICCT, ICCT_ITA, ICCT_8</p></li>
+<li><p>miniMobileNet, miniMobileNetv2</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="snitch-risc-v-cluster">
+<h3>Snitch (RISC-V Cluster)<a class="headerlink" href="#snitch-risc-v-cluster" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-snitch.yml
+<strong>Runner:</strong> testRunner_snitch.py
+<strong>Simulator:</strong> GVSoC
+<strong>Cores:</strong> 9
+<strong>Test Count:</strong> 10</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>Adder, iSoftmax</p></li>
+<li><p>TestiNoNorm, TestAdderLarge, TestiSoftmaxLarge</p></li>
+<li><p>testMatMul, testRQGEMM, TestRQAdd, testRQGEMMTransB</p></li>
+<li><p>testFloatSoftmax</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="snitch-tiled">
+<h3>Snitch-Tiled<a class="headerlink" href="#snitch-tiled" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-snitch-tiled.yml
+<strong>Runner:</strong> testRunner_tiled_snitch.py
+<strong>Simulator:</strong> GVSoC
+<strong>Cores:</strong> 9
+<strong>Test Count:</strong> 8</p>
+<p><strong>Tests with L1 configurations:</strong></p>
+<ul class="simple">
+<li><p>TestiNoNorm: [5000, 10000]</p></li>
+<li><p>TestAdderLarge: [5000, 10000]</p></li>
+<li><p>TestiSoftmaxLarge: [5000, 10000]</p></li>
+<li><p>testRQGEMM: [2000, 5000]</p></li>
+<li><p>testFloatSoftmax: [2000, 5000, 10000]</p></li>
+<li><p>TestRQAdd: [5000, 10000]</p></li>
+<li><p>testFloatGEMM: [2000, 5000, 10000]</p></li>
+<li><p>testFloatGEMMtransB: [2000, 5000, 10000]</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="siracusa-pulp-cluster">
+<h3>Siracusa (PULP Cluster)<a class="headerlink" href="#siracusa-pulp-cluster" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-siracusa.yml
+<strong>Runner:</strong> testRunner_siracusa.py
+<strong>Simulator:</strong> GVSoC
+<strong>Cores:</strong> 8
+<strong>Test Count:</strong> 49</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>Adder, MultIO</p></li>
+<li><p>test1DPad, test2DPad</p></li>
+<li><p>testMatMul, testMatMulAdd</p></li>
+<li><p>testRequantizedDWConv, test2DRequantizedConv</p></li>
+<li><p>iSoftmax, testConcat, testRMSNorm, trueIntegerDivSandwich</p></li>
+<li><p>Hardswish, RQHardswish, testBacktracking</p></li>
+<li><p>testFloatAdder, testFloatGEMM</p></li>
+<li><p>testFloat2DConvolution, testFloat2DConvolutionBias, testFloat2DConvolutionZeroBias</p></li>
+<li><p>testFloat2DDWConvolution, testFloat2DDWConvolutionBias, testFloat2DDWConvolutionZeroBias</p></li>
+<li><p>testFloatLayerNorm, testFloatRelu, testFloatMaxPool, testFloatMatmul</p></li>
+<li><p>testFloatSoftmax, testFloatTranspose, testFloatMul</p></li>
+<li><p>Quant, Dequant, testFloatReduceSum, testFloatReshapeWithSkipConnection</p></li>
+<li><p>testFloatSoftmaxGrad, testFloatSoftmaxCrossEntropy, testFloatSoftmaxCrossEntropyGrad</p></li>
+<li><p>QuantizedLinear</p></li>
+</ul>
+<p><strong>Model Tests:</strong></p>
+<ul class="simple">
+<li><p>simpleRegression, miniMobileNet, miniMobileNetv2</p></li>
+<li><p>Attention</p></li>
+<li><p>MLPerf/KeywordSpotting, MLPerf/ImageClassification, MLPerf/AnomalyDetection</p></li>
+<li><p>CCT/CCT_1_16_16_8, CCT/CCT_2_32_32_128_Opset20</p></li>
+<li><p>testTrainCCT/CCT1_Classifier_Training/CCT_1_16_16_8</p></li>
+<li><p>testFloatDemoTinyViT</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="siracusa-tiled">
+<h3>Siracusa-Tiled<a class="headerlink" href="#siracusa-tiled" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-siracusa-tiled.yml
+<strong>Runner:</strong> testRunner_tiled_siracusa.py
+<strong>Simulator:</strong> GVSoC
+<strong>Cores:</strong> 8
+<strong>Test Count:</strong> 50+</p>
+<p><strong>Jobs:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>siracusa-kernels-tiled-singlebuffer-L2</strong> (27 tests)</p></li>
+<li><p><strong>siracusa-kernels-tiled-doublebuffer-L2</strong> (24 tests)</p></li>
+<li><p><strong>siracusa-models-tiled-singlebuffer-L2</strong> (13 tests)</p></li>
+<li><p><strong>siracusa-models-tiled-singlebuffer-L3</strong> (9 tests)</p></li>
+<li><p><strong>siracusa-models-tiled-doublebuffer-L3</strong> (11 tests)</p></li>
+</ol>
+<p><strong>Key Model Tests:</strong></p>
+<ul class="simple">
+<li><p>simpleRegression, miniMobileNet, miniMobileNetv2</p></li>
+<li><p>Attention, Transformer</p></li>
+<li><p>microLlama/microLlama1, microLlama/microLlama8, microLlama/microLlama8_parallel</p></li>
+<li><p>MLPerf/<em>, CCT/</em></p></li>
+<li><p>testTrainCCT/CCT1_Classifier_Training/*</p></li>
+<li><p>testFloatDemoTinyViT</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="siracusa-neureka-tiled-accelerator">
+<h3>Siracusa-Neureka-Tiled (Accelerator)<a class="headerlink" href="#siracusa-neureka-tiled-accelerator" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-siracusa-neureka-tiled.yml
+<strong>Runner:</strong> testRunner_tiled_siracusa_w_neureka.py
+<strong>Simulator:</strong> GVSoC
+<strong>Cores:</strong> 8
+<strong>Test Count:</strong> 11</p>
+<p><strong>Kernel Tests:</strong></p>
+<ul class="simple">
+<li><p>testRequantizedLinear</p></li>
+<li><p>testPointwise</p></li>
+<li><p>testPointwiseConvBNReLU</p></li>
+<li><p>testPointwiseUnsignedWeights</p></li>
+</ul>
+<p><strong>Model Tests:</strong></p>
+<ul class="simple">
+<li><p>miniMobileNet</p></li>
+<li><p>Attention</p></li>
+<li><p>Transformer</p></li>
+<li><p>microLlama/microLlama1</p></li>
+</ul>
+<p><strong>Configurations:</strong></p>
+<ul class="simple">
+<li><p>With/without Neureka weight memory (wmem)</p></li>
+<li><p>Single/double buffering</p></li>
+<li><p>L2/L3 memory levels</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="softhier">
+<h3>SoftHier<a class="headerlink" href="#softhier" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-softhier.yml
+<strong>Runner:</strong> testRunner_softhier.py
+<strong>Toolchain:</strong> GCC
+<strong>Test Count:</strong> 1</p>
+<p><strong>Tests:</strong> Adder</p>
+</section>
+<hr class="docutils" />
+<section id="chimera">
+<h3>Chimera<a class="headerlink" href="#chimera" title="Link to this heading"></a></h3>
+<p><strong>Workflow:</strong> ci-platform-chimera.yml
+<strong>Runner:</strong> testRunner_chimera.py
+<strong>Simulator:</strong> GVSoC
+<strong>Test Count:</strong> 1</p>
+<p><strong>Tests:</strong> Adder</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="component-to-test-mapping">
+<h2>Component to Test Mapping<a class="headerlink" href="#component-to-test-mapping" title="Link to this heading"></a></h2>
+<section id="tileconstraints">
+<h3>TileConstraints<a class="headerlink" href="#tileconstraints" title="Link to this heading"></a></h3>
+<p>When modifying a TileConstraint, run all tiled tests that use that constraint.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>TileConstraint</p></th>
+<th class="head"><p>Tests to Run</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Conv2DTileConstraint</p></td>
+<td><p>testFloat2DConvolution*, test2DRequantizedConv, miniMobileNet, CCT/*, testFloatDemoTinyViT</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWConv2DTileConstraint</p></td>
+<td><p>testFloat2DDWConvolution*, testRequantizedDWConv, miniMobileNet*, testFloatDemoTinyViT</p></td>
+</tr>
+<tr class="row-even"><td><p>MatMulTileConstraint</p></td>
+<td><p>testFloatMatmul, testMatMul, microLlama/*, Attention</p></td>
+</tr>
+<tr class="row-odd"><td><p>GEMMTileConstraint</p></td>
+<td><p>testFloatGEMM*, testRQGEMM*, testRequantizedLinear</p></td>
+</tr>
+<tr class="row-even"><td><p>MaxPoolTileConstraint</p></td>
+<td><p>testFloatMaxPool, simpleRegression</p></td>
+</tr>
+<tr class="row-odd"><td><p>LayernormTileConstraint</p></td>
+<td><p>testFloatLayerNorm, CCT/*, testFloatDemoTinyViT</p></td>
+</tr>
+<tr class="row-even"><td><p>ConcatTileConstraint</p></td>
+<td><p>testConcat, microLlama/*</p></td>
+</tr>
+<tr class="row-odd"><td><p>TransposeTileConstraint</p></td>
+<td><p>testFloatTranspose</p></td>
+</tr>
+<tr class="row-even"><td><p>iSoftmaxTileConstraint</p></td>
+<td><p>iSoftmax, TestiSoftmaxLarge, microLlama/*</p></td>
+</tr>
+<tr class="row-odd"><td><p>ReduceMeanTileConstraint</p></td>
+<td><p>testReduceMean, testFloatDemoTinyViT</p></td>
+</tr>
+<tr class="row-even"><td><p>NeurekaPWConv2DTileConstraint</p></td>
+<td><p>testPointwise*, miniMobileNet (Neureka)</p></td>
+</tr>
+<tr class="row-odd"><td><p>NeurekaDenseConv2DTileConstraint</p></td>
+<td><p>testRequantizedLinear (Neureka)</p></td>
+</tr>
+<tr class="row-even"><td><p>NeurekaDWConv2DTileConstraint</p></td>
+<td><p>testPointwiseUnsignedWeights (Neureka)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="templates">
+<h3>Templates<a class="headerlink" href="#templates" title="Link to this heading"></a></h3>
+<p>When modifying a Template, run tests that use that template binding.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Template Location</p></th>
+<th class="head"><p>Affected Tests</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Generic/Templates/AddTemplate.py</p></td>
+<td><p>All Add tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>Generic/Templates/ConvTemplate.py</p></td>
+<td><p>All Conv tests</p></td>
+</tr>
+<tr class="row-even"><td><p>PULPOpen/Templates/FloatConvTemplate.py</p></td>
+<td><p>Siracusa float Conv tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>PULPOpen/Templates/GEMMTemplate.py</p></td>
+<td><p>Siracusa GEMM tests</p></td>
+</tr>
+<tr class="row-even"><td><p>Snitch/Templates/*.py</p></td>
+<td><p>Snitch tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>Neureka/Templates/*.py</p></td>
+<td><p>Neureka tests</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="parsers-typecheckers-bindings">
+<h3>Parsers/TypeCheckers/Bindings<a class="headerlink" href="#parsers-typecheckers-bindings" title="Link to this heading"></a></h3>
+<p>Changes to these components affect all tests using the corresponding operator on the affected platform.</p>
+</section>
+<section id="core-framework">
+<h3>Core Framework<a class="headerlink" href="#core-framework" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Affected Tests</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="http://DeeployTypes.py">DeeployTypes.py</a></p></td>
+<td><p>ALL tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="http://AbstractDataTypes.py">AbstractDataTypes.py</a></p></td>
+<td><p>ALL tests</p></td>
+</tr>
+<tr class="row-even"><td><p>TilingExtension/*.py</p></td>
+<td><p>ALL tiled tests</p></td>
+</tr>
+<tr class="row-odd"><td><p>MemoryLevelExtension/*.py</p></td>
+<td><p>ALL tests with memory levels</p></td>
+</tr>
+<tr class="row-even"><td><p>CommonExtensions/OptimizationPasses/*.py</p></td>
+<td><p>Tests using that optimization</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="test-category-index">
+<h2>Test Category Index<a class="headerlink" href="#test-category-index" title="Link to this heading"></a></h2>
+<section id="unit-tests-70-tests">
+<h3>Unit Tests (70 tests)<a class="headerlink" href="#unit-tests-70-tests" title="Link to this heading"></a></h3>
+<p>Single operator tests for correctness validation.</p>
+<p><strong>Run for:</strong> Operator implementation changes, template fixes</p>
+</section>
+<section id="integration-tests-7-tests">
+<h3>Integration Tests (7 tests)<a class="headerlink" href="#integration-tests-7-tests" title="Link to this heading"></a></h3>
+<p>Multi-operator combinations testing data flow.</p>
+<p><strong>Run for:</strong> Binding changes, optimization pass changes</p>
+</section>
+<section id="model-tests-42-tests">
+<h3>Model Tests (42 tests)<a class="headerlink" href="#model-tests-42-tests" title="Link to this heading"></a></h3>
+<p>Full neural network models for end-to-end validation.</p>
+<p><strong>Run for:</strong> Major framework changes, memory management changes</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="change-impact-analysis-guide">
+<h2>Change Impact Analysis Guide<a class="headerlink" href="#change-impact-analysis-guide" title="Link to this heading"></a></h2>
+<section id="quick-reference">
+<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>What Changed</p></th>
+<th class="head"><p>Tests to Run</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/DeeployTypes.py</span></code></p></td>
+<td><p>ALL tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/TilingExtension/*</span></code></p></td>
+<td><p>ALL tiled tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Generic/*</span></code></p></td>
+<td><p>All Generic + inherited platform tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/PULPOpen/*</span></code></p></td>
+<td><p>Siracusa tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Snitch/*</span></code></p></td>
+<td><p>Snitch tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Deeploy/Targets/Neureka/*</span></code></p></td>
+<td><p>Neureka tests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TargetLibraries/PULPOpen/*</span></code></p></td>
+<td><p>Siracusa tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TargetLibraries/Generic/*</span></code></p></td>
+<td><p>Generic tests</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="step-by-step-process">
+<h3>Step-by-Step Process<a class="headerlink" href="#step-by-step-process" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Identify changed files</strong></p></li>
+<li><p><strong>Map to component type:</strong></p>
+<ul class="simple">
+<li><p>Operator (Parser/TypeChecker/Binding/Template) → Operator tests</p></li>
+<li><p>TileConstraint → Tiled tests using that constraint</p></li>
+<li><p>Platform code → Platform tests</p></li>
+<li><p>Core framework → Broad test coverage</p></li>
+</ul>
+</li>
+<li><p><strong>Select platforms:</strong> Run on platforms where changes apply</p></li>
+<li><p><strong>Select configurations:</strong> Include tiled/non-tiled, different L1 sizes</p></li>
+<li><p><strong>Run tests:</strong> Use appropriate testRunner script</p></li>
+</ol>
+</section>
+<section id="example-scenarios">
+<h3>Example Scenarios<a class="headerlink" href="#example-scenarios" title="Link to this heading"></a></h3>
+<p><strong>Scenario 1:</strong> Modified <code class="docutils literal notranslate"><span class="pre">Conv2DTileConstraint.py</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run Siracusa tiled Conv tests</span>
+<span class="nb">cd</span><span class="w"> </span>DeeployTest
+python<span class="w"> </span>testRunner_tiled_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/testFloat2DConvolution<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span><span class="w"> </span>--l1<span class="o">=</span><span class="m">2000</span>
+python<span class="w"> </span>testRunner_tiled_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/miniMobileNet<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span><span class="w"> </span>--l1<span class="o">=</span><span class="m">6000</span>
+python<span class="w"> </span>testRunner_tiled_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/testFloatDemoTinyViT<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span><span class="w"> </span>--l1<span class="o">=</span><span class="m">4000</span>
+</pre></div>
+</div>
+<p><strong>Scenario 2:</strong> Modified <code class="docutils literal notranslate"><span class="pre">PULPOpen/Templates/GEMMTemplate.py</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all GEMM tests on Siracusa</span>
+python<span class="w"> </span>testRunner_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/testFloatGEMM<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span>
+python<span class="w"> </span>testRunner_tiled_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/testFloatGEMM<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span><span class="w"> </span>--l1<span class="o">=</span><span class="m">8000</span>
+python<span class="w"> </span>testRunner_tiled_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/testRQGEMM<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span><span class="w"> </span>--l1<span class="o">=</span><span class="m">5000</span>
+</pre></div>
+</div>
+<p><strong>Scenario 3:</strong> Modified <code class="docutils literal notranslate"><span class="pre">Deeploy/DeeployTypes.py</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run unit tests first</span>
+pytest<span class="w"> </span>testTypes.py
+pytest<span class="w"> </span>testTilerExtension.py
+
+<span class="c1"># Then platform tests</span>
+python<span class="w"> </span>testRunner_generic.py<span class="w"> </span>-t<span class="w"> </span>Tests/Adder
+python<span class="w"> </span>testRunner_siracusa.py<span class="w"> </span>-t<span class="w"> </span>Tests/Adder<span class="w"> </span>--cores<span class="o">=</span><span class="m">8</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="appendix-test-to-platform-matrix">
+<h2>Appendix: Test to Platform Matrix<a class="headerlink" href="#appendix-test-to-platform-matrix" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test</p></th>
+<th class="head"><p>Generic</p></th>
+<th class="head"><p>CortexM</p></th>
+<th class="head"><p>MemPool</p></th>
+<th class="head"><p>Snitch</p></th>
+<th class="head"><p>Siracusa</p></th>
+<th class="head"><p>Siracusa-Tiled</p></th>
+<th class="head"><p>Neureka</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Adder</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>testMatMul</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>testFloatGEMM</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>testFloat2DConvolution</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p>iSoftmax</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>miniMobileNet</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>testFloatDemoTinyViT</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>testPointwise</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Attention</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>microLlama/*</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>-</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="files-reference">
+<h2>Files Reference<a class="headerlink" href="#files-reference" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>CI Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">/docs/ci_test_mapping.json</span></code></p></li>
+<li><p><strong>Operator Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">/docs/test_operator_mapping.json</span></code></p></li>
+<li><p><strong>This Document:</strong> <code class="docutils literal notranslate"><span class="pre">/docs/CI_TEST_DEPENDENCIES.md</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Moritz Scherer, Philip Wiese, Luka Macan, Victor Jung.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: claude/add-claude-docs-tinyvit-01Rx9ZArK3MddiLqaWtRkQL7
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/index.html">main</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/branch/devel/index.html">devel</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/Deeploy/tag/v0.2.0/index.html">v0.2.0</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
