@@ -94,6 +94,42 @@ static void mchan_transfer_2d_loc_strided_ext_strided(
   *cmd_ptr = (uint32_t)loc_stride_2d;
 }
 
+// Transfers longer than the 17-bit length field allows are split into several
+// commands on the currently allocated channel; waiting on that channel waits
+// for all of them.
+#define MCHAN_MAX_TRANSFER_LEN ((1 << MCHAN_TRANSFER_LEN_SIZE) - 1)
+
+static void mchan_transfer_1d_chunked(uint32_t cmd_flags, uint32_t len,
+                                      void *loc, void *ext) {
+  char *l = (char *)loc, *e = (char *)ext;
+  const uint32_t chunk = 1 << (MCHAN_TRANSFER_LEN_SIZE - 1);
+  while (len > 0) {
+    uint32_t n = len > chunk ? chunk : len;
+    mchan_transfer_1d(cmd_flags | n, l, e);
+    l += n;
+    e += n;
+    len -= n;
+  }
+}
+
+static void mchan_transfer_2d_ext_strided_chunked(uint32_t cmd_flags,
+                                                  uint32_t len, void *loc,
+                                                  void *ext,
+                                                  uint32_t ext_size_1d,
+                                                  uint32_t ext_stride_2d) {
+  char *l = (char *)loc, *e = (char *)ext;
+  const uint32_t rows = MCHAN_MAX_TRANSFER_LEN / ext_size_1d;
+  const uint32_t chunk = rows * ext_size_1d;
+  while (len > 0) {
+    uint32_t n = len > chunk ? chunk : len;
+    mchan_transfer_2d_ext_strided(cmd_flags | n, l, e, ext_size_1d,
+                                  ext_stride_2d);
+    l += n;
+    e += (n / ext_size_1d) * ext_stride_2d;
+    len -= n;
+  }
+}
+
 static uint32_t mchan_channel_alloc() { return *cmd_ptr; }
 
 static void mchan_channel_free(uint32_t channel_id) {

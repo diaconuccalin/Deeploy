@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
-from Deeploy.DeeployTypes import NetworkContext, NodeTemplate, OperatorRepresentation, VariableBuffer
+from Deeploy.DeeployTypes import CodeSnippet, NetworkContext, NodeTemplate, OperatorRepresentation, VariableBuffer
 from Deeploy.TilingExtension.AsyncDma import AsyncDma, DirectionWaitingStrategy, DmaDirection, Future
 
 
@@ -31,10 +31,43 @@ class MchanDma(AsyncDma):
         1: NodeTemplate("mchan_transfer_1d(${cmd}, ${loc}, ${ext});"),
         2: NodeTemplate("mchan_transfer_2d_ext_strided(${cmd}, ${loc}, ${ext}, ${size_1d}, ${stride_2d});"),
     }
+    # For tensors whose external buffer exceeds the 17-bit length field: split at runtime (see
+    # mchan_v7.h). Chosen per tensor so all tiles of a tensor share the same call structure.
+    _chunkedTransferTemplates = {
+        1:
+            NodeTemplate("mchan_transfer_1d_chunked(${cmd_flags}, ${size}, ${loc}, ${ext});"),
+        2:
+            NodeTemplate("mchan_transfer_2d_ext_strided_chunked(${cmd_flags}, ${size}, ${loc}, ${ext}, "
+                         "${size_1d}, ${stride_2d});"),
+    }
     _waitingStrategy = DirectionWaitingStrategy(MchanChannelFuture, "channel")
+
+    MAX_TRANSFER_SIZE = (1 << 17) - 1  # bytes representable in the mchan v7 length field
 
     def __init__(self, transferTemplates: Dict[int, NodeTemplate] = _transferTemplates) -> None:
         super().__init__(transferTemplates)
+
+    def transfer(self, ctxt: NetworkContext, externalBuffer: VariableBuffer, localBuffer: VariableBuffer,
+                 shape: Tuple[int, ...], strideExt: Tuple[int, ...], strideLoc: Tuple[int, ...],
+                 direction: DmaDirection, future: Future) -> List[CodeSnippet]:
+        if math.prod(externalBuffer.shape) <= self.MAX_TRANSFER_SIZE:
+            return super().transfer(ctxt, externalBuffer, localBuffer, shape, strideExt, strideLoc, direction, future)
+
+        self.checkTransfer(ctxt, externalBuffer, localBuffer, shape, strideExt, strideLoc, direction)
+        if len(shape) == 2:
+            assert shape[1] <= self.MAX_TRANSFER_SIZE, f"Mchan cannot split 2D transfers with {shape[1]}-byte rows"
+        opRepr = self.transferOpRepr(externalBuffer,
+                                     localBuffer,
+                                     shape,
+                                     strideExt,
+                                     strideLoc,
+                                     direction,
+                                     future,
+                                     checkSize = False)
+        opRepr["size"] = math.prod(shape)
+        opRepr["cmd_flags"] = opRepr["cmd"] - opRepr["size"]
+        del opRepr["cmd"]
+        return [CodeSnippet(self._chunkedTransferTemplates[len(shape)], opRepr)]
 
     def checkTransfer(self, ctxt: NetworkContext, externalBuffer: VariableBuffer, localBuffer: VariableBuffer,
                       shape: Tuple[int, ...], strideExt: Tuple[int, ...], strideLoc: Tuple[int, ...],
@@ -50,9 +83,15 @@ class MchanDma(AsyncDma):
             assert strideLoc[0] == shape[1] and strideLoc[
                 1] == 1, "Mchan supports only contigous transfers for local memory"
 
-    def transferOpRepr(self, externalBuffer: VariableBuffer, localBuffer: VariableBuffer, shape: Tuple[int, ...],
-                       strideExt: Tuple[int, ...], strideLoc: Tuple[int, ...], direction: DmaDirection,
-                       future: Future) -> OperatorRepresentation:
+    def transferOpRepr(self,
+                       externalBuffer: VariableBuffer,
+                       localBuffer: VariableBuffer,
+                       shape: Tuple[int, ...],
+                       strideExt: Tuple[int, ...],
+                       strideLoc: Tuple[int, ...],
+                       direction: DmaDirection,
+                       future: Future,
+                       checkSize: bool = True) -> OperatorRepresentation:
         operatorRepresentation = super().transferOpRepr(externalBuffer, localBuffer, shape, strideExt, strideLoc,
                                                         direction, future)
 
@@ -65,10 +104,11 @@ class MchanDma(AsyncDma):
         mchanFlags += (1 << 3)  # event enable
 
         mchanTransferSize = math.prod(shape)
-        mchanTransferSizeBits = math.ceil(math.log2(mchanTransferSize))
-        assert mchanTransferSizeBits <= 17, (
+        # The length field is 17 bits wide: sizes >= 2**17 would overflow into the flag bits
+        # (e.g. 2**17 sets the direction flag). Tensors with larger buffers use the chunked transfers.
+        assert not checkSize or 0 < mchanTransferSize <= self.MAX_TRANSFER_SIZE, (
             "The transfer size is not representable with 17 bits. "
-            f"Received transfer size {mchanTransferSize} that requires {mchanTransferSizeBits}")
+            f"Received transfer size {mchanTransferSize} > {self.MAX_TRANSFER_SIZE}")
 
         operatorRepresentation["cmd"] = (mchanFlags << 17) + mchanTransferSize
 

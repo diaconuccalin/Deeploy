@@ -86,6 +86,7 @@ This file contains the changelog for the Deeploy project. The changelog is divid
 - Fix invalid escape sequence python error in DeeployTypes.py: appearing when using pytest to launch regressions
 - Fix GAP9 board tests with `--defaultMemLevel L3` reading garbage inputs: place all gapy `--flash-property` options before the positional subcommand and use `image flash run` so the readfs partition (input hex files) is flashed to the device
 - Fix Deeploy 101 tutorial errors: `--profileTiling` usage and the moved intrinsics inventory path
+- Fix Siracusa mchan transfers of exactly 2^17 bytes passing the size check and overflowing the 17-bit length field into the command flags; tensors whose buffer exceeds the length field now use runtime-chunked transfers (`mchan_transfer_1d_chunked`, `mchan_transfer_2d_ext_strided_chunked`)
 
 ### Removed
 - removed experimental `enable3x3` flag, from Neureka Engine. Now, 3x3 mode is enabled by default.
